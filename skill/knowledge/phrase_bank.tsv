@@ -1,0 +1,135 @@
+phrase_id	slot	phrase	paper_count	usage_note	evidence	prior_row	top_papers
+P001	abstract	X is a fundamental process in Y.	0	X is a fundamental process in Y.	prior	P001	
+P002	abstract	Y is the Z that drives/mediates/controles W.	0	Y is the Z that drives/mediates/controles W.	prior	P002	
+P003	abstract	X has been implicated in Y1,2, but the underlying mechanism remains elusive.	0	X has been implicated in Y1,2, but the underlying mechanism remains elusive.	prior	P003	
+P004	abstract	how X regulates Y remains largely unexplored.	0	direct gap question	prior	P004	
+P005	abstract	however, current knowledge on X is scarce4,5, precluding an understanding of Y.	0	gap statement	prior	P005	
+P006	abstract	the molecular basis of X remains unclear.	0	mechanism gap	prior	P006	
+P007	abstract	despite progress in X, the role of Y in Z remains poorly understood.	0	progress + gap	prior	P007	
+P008	abstract	here we establish a system that ...	0	method-introducing Here	prior	P008	
+P009	abstract	here, by leveraging X, we provide a comprehensive survey of Y.	0	Here + method + scope	prior	P009	
+P010	abstract	here, using X, we characterize Y.	0	Here + using + verb	prior	P010	
+P011	abstract	here we report X.	0	short Here we report	prior	P011	
+P012	abstract	we find that X ...	0	lead finding	prior	P012	
+P013	abstract	we identify X as a regulator of Y.	0	identification	prior	P013	
+P014	abstract	we show how X shapes Y.	0	mechanism result	prior	P014	
+P015	abstract	we further uncover X.	0	additional finding	prior	P015	
+P016	abstract	our analyses reveal that X ...	0	analysis-based finding	prior	P016	
+P017	abstract	we observe X (Fig. 1a).	0	finding + figure anchor	prior	P017	
+P018	abstract	together, our findings reveal that X ...	0	integrative finding	prior	P018	
+P019	abstract	our study provides a framework for X.	0	framework contribution	prior	P019	
+P020	abstract	our data thus provide a new view of X.	0	perspective shift	prior	P020	
+P021	abstract	our findings establish X as a mechanism of Y.	0	mechanism claim	prior	P021	
+P022	abstract	these observations have implications for X.	0	broad implication	prior	P022	
+P023	abstract	our work opens avenues for X.	0	future direction	prior	P023	
+P024	abstract	this provides a reference for future X studies.	0	resource contribution	prior	P024	
+P025	introduction	X is a Y that ...	0	generic opening	prior	P025	
+P026	introduction	n X, Y is essential for Z.	0	setting context	prior	P026	
+P027	introduction	X has long been implicated in Y.	0	historical framing	prior	P027	
+P028	introduction	recent advances in X have revealed ...	0	field progress	prior	P028	
+P029	introduction	the X is composed of ...	0	composition/structure	prior	P029	
+P030	introduction	X is characterized by ...	0	feature description	prior	P030	
+P031	introduction	X mediates Y through ...	0	mechanism statement	prior	P031	
+P032	introduction	X functions as a Y that ...	0	function description	prior	P032	
+P033	introduction	previous studies have shown that X ...	0	background evidence	prior	P033	
+P034	introduction	several lines of evidence suggest that X ...	0	supporting evidence	prior	P034	
+P035	introduction	X has been shown to Y in Z1,2.	0	cited finding	prior	P035	
+P036	introduction	however, the role of X in Y remains unclear.	0	gap statement	prior	P036	
+P037	introduction	it is unknown whether X ...	0	direct unknown	prior	P037	
+P038	introduction	despite these advances, the mechanism of X remains elusive.	0	progress + gap	prior	P038	
+P039	introduction	whether X contributes to Y in vivo remains an open question.	0	open question	prior	P039	
+P040	introduction	technical limitations have precluded direct testing of X.	0	method gap	prior	P040	
+P041	introduction	here, we set out to address this gap by ...	0	aim statement	prior	P041	
+P042	introduction	to fill this gap, we ...	0	gap-filling aim	prior	P042	
+P043	introduction	here we used X to test the hypothesis that Y.	0	hypothesis test	prior	P043	
+P044	introduction	here we developed X to enable Y.	0	method-development aim	prior	P044	
+P045	introduction	our results show that X ...	0	result preview	prior	P045	
+P046	introduction	we find that X contributes to Y via Z.	0	preview mechanism	prior	P046	
+P047	introduction	together, these data establish X as a Y.	0	preview claim	prior	P047	
+P048	results	we find that X ...	0	lead finding	prior	P048	
+P049	results	to investigate X, we ...	0	experiment rationale	prior	P049	
+P050	results	we first asked whether X.	0	research question	prior	P050	
+P051	results	we next examined X.	0	transition to next	prior	P051	
+P052	results	to test whether X, we ...	0	test rationale	prior	P052	
+P053	results	X showed a Y-fold increase relative to Z.	0	quantitative observation	prior	P053	
+P054	results	the correlation between X and Y was significant (P < 0.001, two-sided t-test).	0	stats inline	prior	P054	
+P055	results	X was detected in N of M samples.	0	frequency observation	prior	P055	
+P056	results	we observed X in Y of Z cases (N%).	0	proportion observation	prior	P056	
+P057	results	to rule out X, we performed Y.	0	control experiment	prior	P057	
+P058	results	to control for X, we measured Y.	0	control measurement	prior	P058	
+P059	results	this observation was reproduced in an independent cohort (N = X).	0	replication	prior	P059	
+P060	results	(Fig. 1a, Extended Data Fig. 3b)	0	multi-figure anchor	prior	P060	
+P061	results	(Fig. 1a, b)	0	panel anchor	prior	P061	
+P062	results	having established X, we next asked whether Y.	0	building on finding	prior	P062	
+P063	results	we then investigated whether X.	0	next step	prior	P063	
+P064	results	building on these observations, we tested X.	0	extension	prior	P064	
+P065	results	given that X, we hypothesized Y.	0	hypothesis bridge	prior	P065	
+P066	discussion	our data suggest that X ...	0	restated finding	prior	P066	
+P067	discussion	together, these results establish X as a Y.	0	integrative opening	prior	P067	
+P068	discussion	mechanistically, this may reflect X.	0	mechanistic interpretation	prior	P068	
+P069	discussion	one possibility is that X ...	0	alternative mechanism	prior	P069	
+P070	discussion	this is consistent with the notion that X ...	0	supporting interpretation	prior	P070	
+P071	discussion	this observation suggests that X may act by Y.	0	speculative mechanism	prior	P071	
+P072	discussion	we note that our analysis is limited to X.	0	limitation statement	prior	P072	
+P073	discussion	a potential caveat is that X.	0	caveat	prior	P073	
+P074	discussion	it will be important to test X in Y.	0	future validation	prior	P074	
+P075	discussion	these findings have implications for X.	0	broad implication	prior	P075	
+P076	discussion	our results provide a basis for X.	0	applied implication	prior	P076	
+P077	discussion	this may explain X, which has been observed in Y.	0	connection	prior	P077	
+P078	discussion	future studies are needed to determine X.	0	future work	prior	P078	
+P079	discussion	it will be interesting to test whether X.	0	outlook	prior	P079	
+P080	methods	samples were collected from X.	0	past passive	prior	P080	
+P081	methods	data were analysed using X.	0	passive analysis	prior	P081	
+P082	methods	X was performed as described previously1.	0	cited method	prior	P082	
+P083	methods	cells were maintained in X.	0	culture method	prior	P083	
+P084	methods	all experiments were approved by the X.	0	ethics	prior	P084	
+P085	methods	X (N = 3 biological replicates) was measured at Y.	0	biological replicate	prior	P085	
+P086	methods	samples were randomized and blinded.	0	randomization	prior	P086	
+P087	methods	P values were calculated using a two-sided X test.	0	statistical method	prior	P087	
+P088	methods	data are mean ± s.d. of N independent experiments.	0	error bar	prior	P088	
+P089	methods	P < 0.05 was considered significant.	0	significance threshold	prior	P089	
+P090	figure_caption	Fig. 1 | Title-case summary of what is shown.	0	caption headline	prior	P090	
+P091	figure_caption	Extended Data Fig. 1 | ...	0	extended data caption	prior	P091	
+P092	figure_caption	a, Description of panel a.	0	panel label + description	prior	P092	
+P093	figure_caption	b, Related panel description.	0	next panel	prior	P093	
+P094	figure_caption	n = 3 biological replicates. P < 0.001 by two-sided t-test.	0	stats at end	prior	P094	
+P095	figure_caption	Scale bar, X.	0	scale bar	prior	P095	
+P096	figure_caption	Error bars denote s.d. across N replicates.	0	error bar definition	prior	P096	
+P097	sentence	n contrast, X showed Y.	0	contrast	prior	P097	
+P098	sentence	notably, X ...	0	emphasis	prior	P098	
+P099	sentence	consistent with this, X ...	0	supporting	prior	P099	
+P100	sentence	furthermore, X ...	0	addition	prior	P100	
+P101	sentence	moreover, X ...	0	addition	prior	P101	
+P102	sentence	n addition, X ...	0	addition	prior	P102	
+P103	sentence	importantly, X ...	0	emphasis (use sparingly)	prior	P103	
+P104	sentence	surprisingly, X ...	0	unexpected	prior	P104	
+P105	sentence	strikingly, X ...	0	striking finding	prior	P105	
+P106	sentence	n agreement with X, Y ...	0	agreement	prior	P106	
+P107	sentence	here we show that X ...	0	causal claim	prior	P107	
+P108	sentence	X is essential for Y.	0	direct claim	prior	P108	
+P109	sentence	X is required for Y.	0	direct claim	prior	P109	
+P110	sentence	X drives Y by Z.	0	mechanism claim	prior	P110	
+P111	sentence	X promotes Y through Z.	0	mechanism claim	prior	P111	
+P112	sentence	X underlies Y.	0	underlying claim	prior	P112	
+P113	sentence	X may contribute to Y.	0	speculative	prior	P113	
+P114	sentence	X is likely to be involved in Y.	0	hedged	prior	P114	
+P115	sentence	X appears to Y.	0	appearance hedge	prior	P115	
+P116	sentence	X seems to Y.	0	appearance hedge	prior	P116	
+P117	sentence	our data are consistent with X.	0	associative	prior	P117	
+P118	sentence	these observations are in line with X.	0	associative	prior	P118	
+P119	sentence	X supports the notion that Y.	0	supporting	prior	P119	
+P120	sentence	we did not detect X.	0	null result	prior	P120	
+P121	sentence	no significant difference was observed between X and Y.	0	negative result	prior	P121	
+P122	sentence	X was independent of Y.	0	null relation	prior	P122	
+P1005	figure_caption	Data are mean ± s.e.m.	10	Compact error-bar description in legend.	distilled		10.1038_s41586-025-08982-4, 10.1038_s41586-025-09110-y, 10.1038_s41586-025-09335-x
+P1004	abstract	Here we show that	8	First-person declarative claim boundary	distilled		10.1038_s41586-025-08974-4, 10.1038_s41586-025-09176-8, 10.1038_s41586-025-09450-9
+P1006	results	Extended Data Fig.	7	Cross-reference to supplementary figures	distilled		10.1038_s41586-024-08575-7, 10.1038_s41586-025-09223-4, 10.1038_s41586-025-09704-6
+P1010	abstract	remains poorly understood	5	hedging the knowledge gap	distilled		10.1038_s41586-026-10476-w, 10.1038_s41586-026-10493-9, 10.1038_s41586-026-10531-6
+P1008	figure_caption	Created in BioRender	4	Schematic attribution marker	distilled		10.1038_s41586-025-09744-y, 10.1038_s41586-025-09898-9, 10.1038_s41586-025-10040-y
+P1002	sentence	Open access	4	Nature header metadata flag	distilled		10.1038_s41586-025-08843-0, 10.1038_s41586-025-09620-9, 10.1038_s41586-025-09747-9
+P1000	abstract	Here we report	3	Result-announcement opener	distilled		10.1038_s41586-025-08602-1, 10.1038_s41586-025-09256-9, 10.1038_s41586-026-10531-6
+P1003	figure_caption	Scale bars, 50 μm.	3	图注末尾标尺信息标准写法	distilled		10.1038_s41586-025-08885-4, 10.1038_s41586-026-10157-8, 10.1038_s41586-026-10296-y
+P1007	figure_caption	See next page for caption	3	Owing to multi-page complex figure layout	distilled		10.1038_s41586-025-09536-4, 10.1038_s41586-025-09869-0, 10.1038_s41586-026-10755-6
+P1009	results	Together, these results reveal that	3	Synthesis marker linking findings to conclusion	distilled		10.1038_s41586-026-10296-y, 10.1038_s41586-026-10531-6, 10.1038_s41586-026-10671-9
+P1011	results		3	Next-step transition in Results	distilled		10.1038_s41586-025-08856-9, 10.1038_s41586-025-09131-7, 10.1038_s41586-026-10421-x
+P1001	sentence	Extended Data Fig.	3	Cross-reference to supplementary figure	distilled		10.1038_s41586-025-08624-9, 10.1038_s41586-025-09676-7, 10.1038_s41586-025-09829-8

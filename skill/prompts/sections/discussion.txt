@@ -1,0 +1,99 @@
+# Discussion Section — Nature Standard
+
+Goal: interpret findings, acknowledge limits, position in field. **Four-beat structure**:
+1. Restate lead finding (no new data)
+2. Mechanistic interpretation
+3. Limitations / caveats
+4. Broader implications / outlook
+
+## Architecture
+
+### P1 — Restate (no new data)
+- Open by paraphrasing the paper's main result.
+- Templates:
+  - `Our data suggest that X ...`
+  - `Together, these results establish X as a mechanism of Y.`
+  - `We have shown that X ...`
+- Do NOT introduce new experimental results here.
+
+### P2-3 — Mechanistic interpretation
+- Propose mechanism, citing supporting evidence.
+- Templates:
+  - `Mechanistically, this may reflect X.`
+  - `One possibility is that X ...`
+  - `This is consistent with the notion that X ...`
+  - `Our observations are in line with the model proposed by Smith et al.1.`
+- Multiple competing mechanisms: present 2-3, give evidence for each, prefer one with `may`.
+
+### P4 — Limitations / caveats
+- Acknowledge scope of conclusions.
+- Templates:
+  - `We note that our analysis is limited to X.`
+  - `A potential caveat is that X.`
+  - `Our sample size does not allow us to rule out X.`
+- Don't over-apologize; Nature readers respect calibrated honesty.
+
+### P5 — Broader implications / outlook
+- Connect to wider field / clinical / societal impact.
+- Templates:
+  - `These findings have implications for X.`
+  - `Our results provide a basis for X.`
+  - `This may explain the observation that X.`
+- End with calibrated outlook:
+  - `It will be important to test X in Y.`
+  - `Future studies should examine whether X.`
+  - **Never** `More work is needed` (vague) or `We are currently investigating ...` (cliché).
+
+## Hard rules
+
+- Citation density: lower than intro (1 per paragraph).
+- Hedging: heavier than Results (mostly `suggest` / `may` / `could`).
+- No new figures or primary data (refer back to Results).
+- Avoid AI-tells:
+  - `shed light on` → `reveal / clarify / suggest`
+  - `pave the way for` → `enable / inform`
+  - `key insight` → DELETE
+  - `broad implications` → specify the implications
+  - `unprecedented` → DELETE
+
+## v3 TSV priors
+
+Calibrate against these v3 deterministic TSVs from 412 Nature papers:
+- knowledge/results_discussion_openers.tsv (discussion rows) - opener template per discussion paragraph
+- knowledge/cross_section_linkers.tsv (results -> discussion, introduction -> discussion) - bridge sentences
+- knowledge/hedge_verbs.tsv - associative (suggest / support / indicate) and speculative (may / could / might) tiers dominate; downshift from results-tier causal language
+- knowledge/opener_distribution.tsv (discussion rows) - opener distribution
+
+
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.
+
+## Anti-patterns in Discussion
+
+- Repeating abstract verbatim — paraphrase with interpretation
+- Long literature review — keep citations tight
+- `Taken together, these data suggest ...` (acceptable but use `Together`)
+- `Future work will ...` (passive; be specific: `Future studies should examine X.`)
+- `In summary, we have ...` (cliché; weave summary throughout)
+- `Our findings are consistent with previous studies` (vague; name the studies)
+- Confident speculation without hedge

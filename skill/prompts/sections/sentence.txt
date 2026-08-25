@@ -1,0 +1,90 @@
+# Sentence-Level Polish — Nature Standard
+
+Goal: turn one sentence (or short phrase) into a Nature-grade sentence with proper hedge, register, and rhythm.
+
+## Operating procedure
+
+1. **Identify the claim type:**
+   - Causal (own data, controlled comparison) → `demonstrate / show / identify / establish`
+   - Associative (correlative) → `consistent with / suggests / supports`
+   - Speculative (mechanism, hypothesis) → `may / could / prompts us to speculate`
+
+2. **Set register:**
+   - Own work → first-person plural `we`.
+   - Citing prior work → no subject (`X has been shown to Y1,2`).
+   - Methods description → past passive (`was measured`).
+
+3. **Add citation if missing:**
+   - Add numeric superscript after the cited concept (not at sentence end).
+   - Use `[1]`, `[2]` placeholders if user has no refs.
+
+4. **Apply rhythm (NOT a length target):**
+
+   Calibrated distribution from 81,176 sentences in 743 Nature papers:
+
+   | bucket | range | share |
+   |---|---|---|
+   | very short | < 10 | 38% |
+   | short | 10-15 | 16% |
+   | medium | 15-25 | 17% |
+   | long | 25-50 | 21% |
+   | extreme | 50+ | 8% |
+
+   Global mean = 21 words, median = 13, p95 = 60.
+
+   Apply rhythm rather than length:
+   - Short sentence (< 15) for the lead claim or a turning point.
+   - Medium (15-25) for the main exposition.
+   - Long (25-50+) for multi-clause integration (mechanism, comparative, multi-factor).
+   - If a compound clause chain pushes past ~50 words, split into 2 sentences.
+   - Strip filler (In order to -> to, due to the fact that -> because).
+
+   Do NOT target a fixed length per sentence; vary freely within the observed distribution.
+5. **Run anti-AI filter (Rule 1 — anti-AI):**
+   - Scan output for any phrase in `knowledge/anti_ai_patterns.tsv`.
+   - Replace or delete every match.
+
+
+6. **Run Verification Layer (Rule 2 — Verification):**
+   - Trace every figure reference, citation token, numeric statistic (n, P, fold), and named biology-entity in the output back to the input.
+   - Drop or rewrite any token that does not trace. Use whitelist-defined generic vocabulary freely.
+   - Treat em-dash (U+2014) the same as fabrication: zero tolerance in output.
+   - When deletion breaks a sentence, rewrite the affected sentence using only input-traceable vocabulary; leave the rest untouched.
+   - The full rule set, whitelist, and worked examples live in the Verification Layer section of `prompts/system_writer.txt`.
+
+## Patterns to use
+
+| User input | Nature output |
+|---|---|
+| `X plays a crucial role in Y` | `X governs Y` or `X is essential for Y` |
+| `We did an experiment` | `We performed X` (past tense) |
+| `Our results show that X is good` | `We find that X ...` |
+| `X might be involved in Y` | `X may contribute to Y` |
+| `It is important to note that X` | `X ...` (delete the wrapper) |
+| `X has been investigated extensively` | `X has been investigated in ...1–5` (cite specific work) |
+| `Due to the fact that X` | `Because X` |
+| `In order to test X` | `To test X` |
+| `We utilized a novel X` | `We developed an X` |
+| `X sheds light on Y` | `X reveals Y` |
+| `We delve into X` | `We examine X` |
+| `X is very important` | `X is essential for Y` or specific claim |
+
+## Output format
+
+For sentence-level polish, return:
+
+```json
+{
+  "original": "<user input>",
+  "text": "<Nature-grade sentence>",
+  "text_compact": "<tighter alternative if the input was multi-sentence; otherwise identical>",
+  "summary": {
+    "logic_line": "<why this rewrite>",
+    "rules_applied": ["R001", "R020", ...],
+    "patterns_used": ["P107", ...],
+    "ai_tells_avoided": ["delve_into", "in_this_paper", ...],
+    "untraceable_tokens": []   // empty array = pass; non-empty = list of tokens not traceable to input (fabrication). If non-empty, the rewrite MUST be redone.
+  }
+}
+
+```

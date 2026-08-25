@@ -1,0 +1,22 @@
+from_section	to_section	tier	claim_verb	evidence_verb	hedge_verb	total_occurrences	exemplar_pattern	source
+introduction	results	associative	asked	find	suggest	70	Having established X, we next asked whether Y	cross_section_linkers+v3_deterministic
+introduction	results	associative	y	find	suggest	60	Using this approach, we Y	cross_section_linkers+v3_deterministic
+results	discussion	associative	examine	examine	suggest	57	These results suggest that X	cross_section_linkers+v3_deterministic
+results	discussion	associative	examine	examine	indicate	16	These results indicate that X	cross_section_linkers+v3_deterministic
+results	discussion	causal	examine	examine	demonstrate	10	These results demonstrate that X	cross_section_linkers+v3_deterministic
+introduction	results	associative	performed	find	suggest	9	To investigate X, we performed Y	cross_section_linkers+v3_deterministic
+results	discussion	associative	y	y	suggest	6	Using this approach, we Y	cross_section_linkers+v3_deterministic
+methods	results	associative	implement	y	suggest	5	Using this approach, we Y	cross_section_linkers+v3_deterministic
+results	discussion	causal	examine	examine	show	5	These results show that X	cross_section_linkers+v3_deterministic
+introduction	results	associative	examine	find	suggest	5	These results suggest that X	cross_section_linkers+v3_deterministic
+introduction	results	associative	asked	show	suggest	5	Having shown X, we next asked whether Y	cross_section_linkers+v3_deterministic
+results	discussion	associative	conclude	conclude	suggest	4	We conclude that X	cross_section_linkers+v3_deterministic
+introduction	results	causal	show	show	suggest	4	Here we show that X	cross_section_linkers+v3_deterministic
+results	discussion	associative	propose	propose	propose	3	We propose that X	cross_section_linkers+v3_deterministic
+introduction	results	associative	identify	identify	suggest	2	Using X, we identify Y	cross_section_linkers+v3_deterministic
+introduction	results	associative	performed	identify	suggest	2	To identify X, we performed Y	cross_section_linkers+v3_deterministic
+introduction	results	associative	present	find	suggest	2	Having established X, we present Y	cross_section_linkers+v3_deterministic
+introduction	results	associative	analysed	find	suggest	2	To investigate X, we analysed Y	cross_section_linkers+v3_deterministic
+introduction	discussion	associative	asked	find	suggest	2	These results indicate that X	cross_section_linkers+v3_deterministic
+introduction	results	associative	examined	find	suggest	2	We next examined whether X	cross_section_linkers+v3_deterministic
+introduction	results	associative	first	find	suggest	2	We first sought to X by Y	cross_section_linkers+v3_deterministic

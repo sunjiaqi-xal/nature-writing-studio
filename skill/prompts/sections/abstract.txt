@@ -1,0 +1,85 @@
+# Abstract Section — Nature Standard
+
+Goal: ≤ 200 words (often ≤ 150). One paragraph. Self-contained — readable without the rest of the paper.
+
+## Required beats (in order)
+
+1. **Broad background** (1 sentence): state the field or phenomenon.
+   - Template: `X is a Y that drives/underlies/regulates Z.`
+   - Cite 1-2 most relevant background refs.
+
+2. **Domain concept** (1 sentence): name the specific object/process.
+   - Template: `Y is the Z that mediates W in [domain].`
+   - Cite key concept refs.
+
+3. **Knowledge gap** (1 sentence): what is unknown.
+   - Template: `However, the role/mechanism of X remains unclear / elusive / poorly understood.`
+   - This is mandatory. Without it the abstract is a description, not a research abstract.
+
+4. **Approach + scope** (1 sentence): what the authors did, at what scale.
+   - Template: `Here, by/using/in X, we [verb] Y across N [samples/systems/conditions].`
+   - The `Here we ...` formulation is mandatory. Never `In this paper, ...`.
+
+5. **Lead finding** (1-2 sentences): the most important result.
+   - Template: `We find/show/identify that X (Fig. 1a).`
+   - Include a figure anchor.
+
+6. **Secondary finding** (1 sentence, optional): additional result.
+   - Template: `We further show/uncover that X.`
+
+7. **Integrative finding** (1 sentence): synthesize.
+   - Template: `Together, our findings reveal that X ...`
+
+8. **Significance** (1 sentence): why the result matters.
+   - Template: `Our study provides a framework for X / establishes X as a mechanism of Y.`
+   - Never end with `More work is needed` or `Future studies will ...`.
+
+## Hard rules
+
+- First-person plural `we` only. Never `the authors`, `this study`, `in this paper`.
+- Minimize abbreviations: only universally known ones (DNA, RNA, CRISPR, mRNA, PCR, HIV). Define specialized ones later in intro.
+- No citation groups > 5 (split if more).
+- No equations, no tables.
+- Hedging: causal claim → `demonstrate`/`show`; correlative → `consistent with`; speculative → `may`/`suggests`.
+- Every result sentence should have a figure anchor if the user provided figures; otherwise omit figure references entirely.
+- Never insert [N] / [Fig. X] / [Table X] markers unless the user explicitly provides them.
+
+## v3 TSV priors
+
+Calibrate against these v3 deterministic TSVs from 412 Nature papers (use as priors, not templates to copy):
+- knowledge/opener_distribution.tsv (abstract rows) - pick first-sentence opener; top entry "here we" (387 occurrences, 279 papers)
+- knowledge/gap_transitions.tsv - pick pivot word (although/however/but/yet/while/whereas/despite/nevertheless) + template to fill beat 3 (knowledge gap)
+- knowledge/hedge_verbs.tsv - enforce causal/associative/speculative verb tier; "suggest" (associative, 1645/409 papers) for beat 5 caveats
+
+
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.
+
+## Anti-patterns to avoid in abstract specifically
+
+- `In conclusion, we ...`
+- `This is the first report of ...` (overused; never unless true and exceptional)
+- `Our findings have broad implications ...` (too generic; specify)
+- `Future studies will ...` (does not belong in abstract)
+- Long noun-phrase stacks (3+ modifiers before noun)
+- Methodology described in extreme detail (save for Methods section)

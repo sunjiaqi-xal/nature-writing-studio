@@ -1,0 +1,86 @@
+rule_id	category	description	paper_count	severity_votes	severity	exemplar_quote	primary_section	evidence	prior_row	top_papers
+R001	hedge_calibration	"causal claim: 用 ""we demonstrate / we show / we identify""; 强结果用过去式 direct claim"	multi-paper		major			prior		
+R002	hedge_calibration	"associative claim: 用 ""consistent with / in line with / supports / suggests""; 不强行归因"	multi-paper		major			prior		
+R003	hedge_calibration	"speculative claim: 用 ""may / could / might / possibly / prompts us to speculate""; 用 modal + 模糊主语"	multi-paper		major			prior		
+R004	hedge_calibration	"gap statement: 用 ""remains elusive / unclear / poorly understood / largely unexplored""; 不是 ""nobody knows"""	multi-paper		major			prior		
+R005	claim_grammar	"abstract 必含 ""Here we ..."" 或 ""Here, by/in/using ..., we ..."" 一句，明示本文工作"	multi-paper		major			prior		
+R006	claim_grammar	"abstract 末尾必含 ""Our study/data/findings provide(s) ..."" 或 ""Together, our findings reveal ..."" 总结性 claim"	multi-paper		major			prior		
+R007	claim_grammar	"results 段每段一个 lead claim 句（""We find / show / identify / demonstrate ...""），然后 evidence"	multi-paper		major			prior		
+R008	claim_grammar	"discussion 用 ""Our findings suggest/imply/indicate""；不要重复 abstract 里的 ""demonstrate"""	multi-paper		major			prior		
+R009	evidence_bound	每个非平凡 claim 挂 figure/data citation（Fig. X, Extended Data Fig. X, Table X）	multi-paper		major			prior		
+R010	evidence_bound	citation 紧跟被引概念之后，不移到句末	multi-paper		major			prior		
+R011	paragraph_craft	intro paragraph 1：领域最宽背景（1-2 句）+ 关键概念定义（1-2 句）+ 现状综述（2-3 句）	multi-paper		major			prior		
+R012	paragraph_craft	intro paragraph 2-3：现有方法局限 / 知识 gap / 未解问题	multi-paper		major			prior		
+R013	paragraph_craft	intro paragraph 末 / 开新段：本文工作 + 总体方法 + 总体发现预告	multi-paper		major			prior		
+R014	paragraph_craft	discussion：先重申 lead finding（不带新数据），再 mechanistically interpret，再 limitation，再 implication	multi-paper		major			prior		
+R015	register_tone	"第一人称复数 ""we"" 主导，避免 ""the authors""、单数 ""I""、passive 过度"	multi-paper		major			prior		
+R016	register_tone	"hedged over-claim 黑名单：避免 ""obviously / clearly / undoubtedly / certainly / of course"""	multi-paper		major			prior		
+R017	register_tone	"Nature 不使用感叹号，不使用引号强调（避免 ""novel"" ""first"" ""groundbreaking"" 出现过多）"	multi-paper		minor			prior		
+R018	citation_rhythm	intro 段引用密度高（每句 1-3 个上标），results/discussion 引用密度下降（自己数据为主）	multi-paper		major			prior		
+R019	citation_rhythm	"引用组格式：连续引用用连字符 ""1–5""，非连续用逗号 ""1,3,5"""	multi-paper		minor			prior		
+R020	sentence_craft	避免长句堆叠（>50 词一句话）；用 period 而非 comma + clause 链	multi-paper		major			prior		
+R021	sentence_craft	topic sentence 优先：每段第一句给出该段 lead 主张；细节证据在后	multi-paper		major			prior		
+R022	sentence_craft	parallel structure：并列成分用相同语法形式	multi-paper		minor			prior		
+R023	numerals_notation	"10 以下数字拼写（""three mutants""），10 及以上用数字（""152 streams""）；Nature 例外：figure/table 里全数字"	multi-paper		minor			prior		
+R024	numerals_notation	"百分号紧贴数字：""52%"" not ""52 percent""；单位前空格：""5 °C"" not ""5°C""（Nature 例外）"	multi-paper		minor			prior		
+R025	numerals_notation	基因/蛋白写法：人基因全大写斜体（HES1），蛋白首字母大写正体（Hes1）；小鼠全小写斜体（Hes1）	multi-paper		minor			prior		
+R026	numerals_notation	拉丁学名斜体：Homo sapiens, Escherichia coli（属名大写、种名小写、整体斜体）	multi-paper		minor			prior		
+R027	abbreviation	use abbreviation 时先 full term + parenthetical abbreviation，第二次起只用缩写	multi-paper		minor			prior		
+R028	abbreviation	abstract 内通常不用缩写（除非通用如 DNA, RNA, CRISPR）；intro 之后可广泛使用	multi-paper		minor			prior		
+R029	figure_caption	"figure caption 第一句 = 概括整图核心信息（""Fig. 1 | Title-case headline of what is shown""）"	multi-paper		major			prior		
+R030	figure_caption	caption 内嵌 panel labels (a, b, c) 对应图中标注；每个 panel 一句说明	multi-paper		major			prior		
+R031	figure_caption	caption 末尾含 statistics (n, P, error bar definition) when relevant	multi-paper		minor			prior		
+R032	figure_caption	"avoid ""shown in figure"" / ""see figure"" 这类占位表达；caption 自解释"	multi-paper		minor			prior		
+R033	methods_style	"methods 用过去式 + 第三人称/被动（""was measured"" / ""were collected""），不是 ""we measured"""	multi-paper		major			prior		
+R034	methods_style	方法描述给可重复细节：仪器型号、软件版本、参数、n、统计方法	multi-paper		major			prior		
+R035	methods_style	"统计方法先于结果；P 值给完整（""P = 0.003"" not ""P < 0.01"" if precise）"	multi-paper		minor			prior		
+R036	methods_style	伦理声明在 methods 末尾：人/动物研究必含 IRB / ethics committee approval	multi-paper		major			prior		
+R037	data_statement	"data availability：必有 ""Data are available at ... / Data deposition: ... / Source data are provided with this paper."""	multi-paper		major			prior		
+R038	data_statement	"code availability：custom code 必有 ""Custom code is available at ... / Code is deposited at ..."""	multi-paper		major			prior		
+R039	data_statement	accession numbers 在 data/code availability 段集中列出，逗号分隔	multi-paper		minor			prior		
+R040	title_craft	"title 长度 8-15 词，核心发现/对象在前，避免 ""Study of ..."" ""Investigation on ..."" ""Research on ..."""	multi-paper		major			prior		
+R041	title_craft	副标题用冒号或介词短语，主标题是发现，副标题是对象/限定	multi-paper		major			prior		
+R042	title_craft	"疑问句标题慎用，多用陈述句；Nature 接受 ""How does X?"" 但 Cell 偏好陈述"	multi-paper		minor			prior		
+R043	hedging_red_flags	"黑名单（永远不在 Nature 用）：""obviously / clearly / undoubtedly / it goes without saying / needless to say"""	multi-paper		critical			prior		
+R044	hedging_red_flags	"黑名单：避免 ""very / extremely / highly"" 等强化副词过度使用；用具体度量替代"	multi-paper		major			prior		
+R045	hedging_red_flags	"黑名单：避免 ""novel"" 反复用（一篇文章最多 1 次，多用 ""previously uncharacterized""）"	multi-paper		major			prior		
+R046	hedging_red_flags	"黑名单：避免 ""in this paper we"" / ""in this study we"" / ""the authors"""	multi-paper		critical			prior		
+R047	hedging_red_flags	"黑名单：避免 ""It is important to note that"" / ""It should be noted that"" / ""It is worth mentioning that"""	multi-paper		critical			prior		
+R048	hedging_red_flags	"黑名单：避免 ""we believe that"" / ""in our opinion"" / ""we think that"""	multi-paper		major			prior		
+R049	hedging_red_flags	"黑名单：避免 ""due to the fact that"" / ""in spite of the fact that"" / ""owing to the fact that"""	multi-paper		major			prior		
+R050	hedging_red_flags	"黑名单：避免 ""a large number of"" / ""the majority of"" / ""a great deal of"""	multi-paper		minor			prior		
+R051	hedging_red_flags	"黑名单：避免 ""in order to""；用 ""to"""	multi-paper		minor			prior		
+R052	hedging_red_flags	"黑名单：避免 ""we delve into"" / ""we navigate the complexities of"" / ""the intricate landscape of"""	multi-paper		critical			prior		
+R053	hedging_red_flags	"黑名单：避免 ""in today's world"" / ""in the modern era"" / ""in contemporary society"""	multi-paper		critical			prior		
+R054	hedging_red_flags	"黑名单：避免 ""plays a crucial role"" / ""plays a pivotal role"" / ""is of paramount importance"""	multi-paper		critical			prior		
+R055	hedging_red_flags	"黑名单：避免 ""cutting-edge"" / ""state-of-the-art"" / ""groundbreaking"" / ""revolutionary"""	multi-paper		major			prior		
+R056	hedging_red_flags	"黑名单：避免 ""shed light on"" / ""shed new light on"" / ""illuminate"" (overused)"	multi-paper		major			prior		
+R057	hedging_red_flags	"黑名单：避免 ""fascinating"" / ""remarkable"" / ""stunning"" / ""surprising"" (情感形容词)"	multi-paper		major			prior		
+R058	hedging_red_flags	"黑名单：避免 ""leverage"" (用作动词) / ""robust"" (用作通用形容)"	multi-paper		major			prior		
+R059	hedging_red_flags	"黑名单：避免 ""dive into"" / ""explore the realm of"" / ""unpack the nuances"""	multi-paper		critical			prior		
+R060	hedging_red_flags	"黑名单：避免 ""harness the power of"" / ""tapestry of"" / ""symphony of"""	multi-paper		critical			prior		
+R1000	evidence_bound	Each functional claim is tied to a specific assay, panel, or Extended Data figure.	5	4/5	major	These results provide evidence for the colocalization of endocytosed lipids with	results	distilled		10.1038_s41586-025-08595-x, 10.1038_s41586-025-08941-z, 10.1038_s41586-025-09200-x
+R1009	claim_grammar	Main finding introduced with 'Here we identify ... as crucial for ...' opener in abstract.	5	4/5	major	Here we identify dynamic cytoskeletal regulation of LEC shape, induced by isotro	abstract	distilled		10.1038_s41586-025-08724-6, 10.1038_s41586-025-09291-6, 10.1038_s41586-025-09450-9
+R1003	sentence_craft	Long compound sentences with multiple embedded relative clauses and parallel predicates	5	2/5	minor	Methods based on shared haplotypes and rare variants improve power but are not e	abstract	distilled		10.1038_s41586-024-08275-2, 10.1038_s41586-024-08460-3, 10.1038_s41586-025-08628-5
+R1004	figure_caption	Captions state statistical test name, n, and inclusion thresholds	5	2/5	minor	tested using a two-sided Mann–Whitney U-test	figure_caption	distilled		10.1038_s41586-024-08350-8, 10.1038_s41586-025-09223-4, 10.1038_s41586-025-09328-w
+R1006	sentence_craft	Long compound declaratives with stacked subordinate clauses and embedded references dominate.	5	2/5	minor	By measuring the full matrices of nullifier correlations with sufficiently low o	abstract	distilled		10.1038_s41586-025-08602-1, 10.1038_s41586-025-08840-3, 10.1038_s41586-025-09814-1
+R1010	evidence_bound	Every quantitative association is paired with an exact P value, often alongside OR or λGC.	4	3/4	major	OR = 5.96, P = 4.37 × 10–11	results	distilled		10.1038_s41586-025-08757-x, 10.1038_s41586-025-08922-2, 10.1038_s41586-025-09866-3
+R1017	claim_grammar	Abstract opens with declarative 'Here we show that' structure stating a capability claim	4	3/4	major	Here we show that the reasoning abilities of LLMs can be incentivized	abstract	distilled		10.1038_s41586-025-08896-1, 10.1038_s41586-025-09422-z, 10.1038_s41586-025-10011-3
+R1005	sentence_craft	Long, information-dense sentences with embedded parenthetical methods and stacked citations.	4	2/4	major	After confirmation of in vitro and in vivo (nude rat model) equivalence	abstract	distilled		10.1038_s41586-024-08463-0, 10.1038_s41586-026-10259-3, 10.1038_s41586-026-10311-2
+R1015	evidence_bound	Every substantive structural claim is tethered to a parenthetical figure/Extended Data citation and to numbered references.	4	2/4	major	(Extended Data Fig. 6)	results	distilled		10.1038_s41586-024-08575-7, 10.1038_s41586-025-09068-x, 10.1038_s41586-025-09223-4
+R1022	claim_grammar	Nature-style claim opener with 'Here we report' anchored to an experimental setup.	4	2/4	major	Here we report the direct observation of the Migdal effect	abstract	distilled		10.1038_s41586-025-09918-8, 10.1038_s41586-026-10113-6, 10.1038_s41586-026-10363-4
+R1011	claim_grammar	Canonical Nature 'Here we report' opener before stating the principal observational finding in the abstract.	3	3/3	major	Here we report spectroscopy from the JWST Advanced Deep Extragalactic Survey	abstract	distilled		10.1038_s41586-025-08779-5, 10.1038_s41586-025-09965-1, 10.1038_s41586-026-10479-7
+R1012	evidence_bound	Inline parenthetical anchoring of every quantitative claim to a specific Supplementary Note/Table/Figure	3	3/3	major	(Supplementary Notes XVI–XVII)	results	distilled		10.1038_s41586-025-08816-3, 10.1038_s41586-025-09452-7, 10.1038_s41586-026-10716-z
+R1014	evidence_bound	Quantitative claims are tightly bound to inline confidence intervals, P-values and test names (Fisher's exact test, block jackknife, t-test).	3	3/3	major	(95% CI = 23.7–30.6%)	results	distilled		10.1038_s41586-025-09031-w, 10.1038_s41586-025-09514-w, 10.1038_s41586-025-09670-z
+R1018	evidence_bound	Every inferential step is followed by an inline named statistical test with exact P-value in same clause	3	3/3	major	P = 0.002, Fisher’s exact test	results	distilled		10.1038_s41586-025-09614-7, 10.1038_s41586-025-09909-9, 10.1038_s41586-026-10641-1
+R1001	evidence_bound	Inline statistical reporting with n, ΔAICc, d.f. and P values immediately following claims	3	2/3	major	n = 5,987 presentations; distance term ΔAICc = −28.9, d.f. = 1	figure_caption	distilled		10.1038_s41586-025-08855-w, 10.1038_s41586-025-09216-3, 10.1038_s41586-025-09709-1
+R1002	figure_caption	Multi-panel captions explaining stimuli codes and statistical groupings (Tukey letters)	3	2/3	major	groupings that show no significant difference after a Tukey post hoc test (P > 0	figure_caption	distilled		10.1038_s41586-025-09216-3, 10.1038_s41586-025-10037-7, 10.1038_s41586-026-10530-7
+R1007	hedge_calibration	Abstract closes with hedged evaluation rather than strong efficacy claim	3	2/3	major	represents an interesting chemical series towards identifying clinical candidate	abstract	distilled		10.1038_s41586-025-08651-6, 10.1038_s41586-026-10208-0, 10.1038_s41586-026-10363-4
+R1008	figure_caption	Extended multi-panel figure caption with detailed panel-by-panel description	3	2/3	major	The main panel shows DUACS SSHA with an ascending	figure_caption	distilled		10.1038_s41586-025-08722-8, 10.1038_s41586-025-08782-w, 10.1038_s41586-025-10093-z
+R1013	figure_caption	Figure legend ends with compact statistical block: n, mean±s.e.m., and test name.	3	2/3	major	n = 4 per group. Data are mean ± s.e.m. Unpaired two-sided t-test.	figure_caption	distilled		10.1038_s41586-025-08982-4, 10.1038_s41586-025-09362-8, 10.1038_s41586-026-10444-4
+R1016	claim_grammar	"Active first-person plural result verbs anchor achievement claims (""we demonstrate that"")."	3	2/3	major	Here we demonstrate that (biological) aminoacyl-thiols	abstract	distilled		10.1038_s41586-025-09388-y, 10.1038_s41586-025-09788-0, 10.1038_s41586-026-10378-x
+R1019	evidence_bound	Statistical tests are reported with exact test name, sample size and FDR adjustment.	3	2/3	major	Wilcoxon rank-sum test, false discovery rate (FDR)-adjusted P = 2.8 × 10−6	results	distilled		10.1038_s41586-025-09676-7, 10.1038_s41586-026-10363-4, 10.1038_s41586-026-10448-0
+R1020	evidence_bound	每一项主张紧跟具体证据来源:Extended Data Fig. 编号、n= 样本量或 Supplementary Table 引用。	3	2/3	major	Only phages with SV evidence were included	results	distilled		10.1038_s41586-025-09125-5, 10.1038_s41586-025-09786-2, 10.1038_s41586-026-10368-z
+R1021	hedge_calibration	Causal/interpretive claims are softened with 'suggest' or 'consistent with' rather than assertive verbs.	3	2/3	major	Together, these results suggest the animals maintained an internal belief	results	distilled		10.1038_s41586-025-09805-2, 10.1038_s41586-026-10155-w, 10.1038_s41586-026-10391-0
+R1023	claim_grammar	Abstract opens with canonical Nature claim 'Here we report an optical archival storage technology'	3	2/3	major	Here we report an optical archival storage technology based on femtosecond	abstract	distilled		10.1038_s41586-025-10042-w, 10.1038_s41586-025-10057-3, 10.1038_s41586-026-10718-x
+R1024	sentence_craft	Very long coordinated sentences with stacked noun phrases and parentheticals in the abstract.	3	2/3	major	develop accurate, interpretable rodent and multi-species biomarkers of chronolog	abstract	distilled		10.1038_s41586-025-10088-w, 10.1038_s41586-026-10542-3, 10.1038_s41586-026-10598-1

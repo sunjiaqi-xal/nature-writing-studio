@@ -1,0 +1,123 @@
+﻿name: nature-writing-studio
+display_name: Nature Writing Studio
+description: |
+  把任意科学文本（中文或英文）改写成 Nature Portfolio 风格的英文。知识库来自 657 篇 Nature 论文逐篇抽取（覆盖率 87.6%）+ 30 篇对抗 AI-tell 抽样。v2.0.1 在 v2.0.0 基础上新增 target=multi_section 多节编排接口：自动选 SP 版式、强制 logic_line+story_arc+entity_registry 前置、按节序调用 7 个节级 prompt、跑 10 条 X001-X010 跨节审计、返回 sections+meta 数组。用于 Nature 风格润色、中译英、去 AI 味、按章节改写（摘要 / 前言 / 方法 / 结果 / 讨论 / 图例 / 单句）、整稿多节编排。返回正文 + 精简版 + 改写说明。
+version: 2.0.1
+status: stable
+entry: SKILL.md
+
+prompt_version: v2.0.1
+rule_set_version: v2.0.1-95rules
+knowledge_version: v2.0.1
+distillation_date: 2026-08-13
+llm_backend: MiniMax-M3
+
+instructions: |
+  1. 读 SKILL.md 拿到调用契约与输出约定。
+  2. 读 prompts/system_writer.txt 看操作原则与 24 行每域真实句长（先验而非硬约束）。
+  3. 读 prompts/style_guide.txt 看速查清单。
+  4. 读 prompts/sections/<target>.txt 拿目标章节的专用规则（multi_section 走 prompts/sections/multi_section.txt 编排器）。
+  5. 按需加载知识库：
+     - 必加: knowledge/writing_rules.tsv (85 条 v2.0.0) + cross_section_rules.tsv (10 条 v2.0.1) + anti_ai_patterns.tsv (136 条, 含 16 critical + 114 high)
+     - 选加: phrase_bank.tsv (134 句) / domain_register.tsv (46 个学科) / paper_story_patterns.tsv (12 种 SP 模板) / sentence_stats_by_domain.tsv (24 域)
+     - v3 确定型蓄知（MiniMax-M3 逐篇观察 412 篇 Nature 论文、LCS 校验、spot-check 18/18）：
+         * knowledge/gap_transitions.tsv — 1668 个 gap 句模板按 (section, pivot_word) 索引，abstract/introduction 设立使用者发现时取 pivot 词
+         * knowledge/opener_distribution.tsv — 10488 个句开头 3-gram，按 section 选取常用 opener（abstract: "here we" 279 papers, "we find", "these results"）
+         * knowledge/cross_section_linkers.tsv — 1766 个节间衔接模板（intro->results: "Having established X, we next asked whether Y" 50 papers；蒸馏源 414 篇 Nature paper paragraph-level bridge, agent-extracted）
+         * knowledge/hedge_verbs.tsv — 124 个 verb-tier 簇，强制 causal/associative/speculative 三档实践（suggest 1645/409 papers, show 1379/401 papers）
+         * knowledge/results_discussion_openers.tsv — 4864 个 results/discussion 首句模板
+  6. 按目标章节架构与 hedge 三档改写输入文本。
+  7. 改写后扫描 anti_ai_patterns.tsv，命中 16 条 critical + 114 条 high 黑名单立即替换或删除。
+  8. 输出正文 + 精简版 + 改写说明，自然对话不输出 JSON 包装。
+
+constraints:
+  - 不编造具体数字；用户没写就标 [TBD]。
+  - 不编造引用；用 [1]、[2] 占位。
+  - 不使用 anti_ai_patterns.tsv 中的任何短语。
+  - 不以"In this paper" / "In this study" / "The authors" / "In recent years" 开头。
+  - 不以"More work is needed" / "Future studies will" / "In conclusion" 收尾。
+  - 不用第一人称单数 I。
+  - 不用感叹号。
+  - 不把"novel" / "previously uncharacterized" / "unique" 在同一篇里用超过 1 次。
+  - 按证据强度 hedge：强证据 → demonstrate / show；关联 → consistent with / in line with；推测 → may / could。
+  - 每个非平凡断言必须挂图 / 数据锚定，或标 [Fig. X 待分配]。
+
+knowledge_summary:
+  writing_rules:
+    rows: 85
+    prior_retained: 60
+    distilled_added: 25
+    categories: 14
+  phrase_bank:
+    rows: 134
+    prior_retained: 122
+    distilled_added: 12
+    slots: 7
+  anti_ai_patterns:
+    rows: 136
+    prior_retained: 132
+    adversarial_added: 3
+    severity: {critical: 29, high: 100+, low: few}
+  domain_register:
+    rows: 46
+    prior_retained: 22
+    distilled_added: 24
+  paper_story_patterns:
+    rows: 12
+  sentence_stats_by_domain:
+    rows: 24
+  v3_deterministic:
+    source_papers: 412
+    extraction_method: MiniMax-M3 per-paper observation of .evidence_packet.md
+    validation: LCS-based quote substring (ratio >= 0.5)
+    spot_check_pass_rate: "18/18 (100%)"
+    gap_transitions: {rows: 1668, pivots: [although, however, but, yet, while, whereas, despite, nevertheless]}
+    opener_distribution: {rows: 10488, top: "here we in abstract (387 occurrences / 279 papers)"}
+    cross_section_linkers: {rows: 1766, top: "Having established X, we next asked whether Y (intro->results, 50 papers)"}
+    hedge_verbs: {rows: 124, tiers: [causal, associative, speculative]}
+    results_discussion_openers: {rows: 4864}
+
+distillation_provenance:
+  source_papers: 750
+  successfully_extracted: 657
+  coverage_pct: 87.6
+  failed_persistent: 93
+  adversarial_sample_size: 30
+  adversarial_divergences: 311
+  adversarial_breakdown: {critical: 40, high: 127, minor: 124}
+  prior_rules_total: 348
+  prior_retained: 348
+  v3_layer:
+    deterministic_ai: MiniMax-M3 per-paper observation of 412 Nature papers
+    evidence_input: 750 .evidence_packet.md files in nature-writing-build/work/papers_clean/
+    llm_endpoint: /v1/responses (wire_api=responses)
+    driver: distillation/v2/scripts/deterministic_distill.py
+    aggregator: distillation/v2/scripts/aggregate_deterministic.py
+    spot_check: distillation/v2/scripts/spot_check_quotes.py (18/18 passed)
+    output: 5 TSVs (gap_transitions/opener_distribution/cross_section_linkers/hedge_verbs/results_discussion_openers)
+    knowledge_layer: v3 probabilistic priors on top of v2.0.1 deterministic rules
+  aggregation_threshold_paper_count: 3
+  similarity_metric: jaccard_token_set
+  sub_agent_available: false
+  validation: deterministic_python
+
+required_files:
+  - SKILL.md
+  - prompts/system_writer.txt
+  - prompts/style_guide.txt
+  - prompts/sections/<target>.txt
+  - knowledge/writing_rules.tsv
+  - knowledge/phrase_bank.tsv
+  - knowledge/anti_ai_patterns.tsv
+  - knowledge/domain_register.tsv
+  - knowledge/paper_story_patterns.tsv
+  - knowledge/sentence_stats_by_domain.tsv
+  - knowledge/provenance.json
+  - knowledge/PROVENANCE.md
+  - knowledge/gap_transitions.tsv
+  - knowledge/opener_distribution.tsv
+  - knowledge/cross_section_linkers.tsv
+  - knowledge/hedge_verbs.tsv
+  - knowledge/results_discussion_openers.tsv
+  - knowledge/inter_section_argue_chains.tsv  # v3.1 proto seed (21 rows, derived from cross_section_linkers + hedge_verbs v3_deterministic)
+

@@ -1,0 +1,98 @@
+# Figure Legend — Nature Standard
+
+Goal: standalone, scannable, complete. Reader should understand the figure without seeing it.
+
+## Architecture
+
+```
+Fig. N | Title-Case Headline Statement Summarizing What Is Shown.
+
+a, Description of panel a. Specific finding with quantitative anchor.
+b, Description of panel b. Specific finding with quantitative anchor.
+c, Description of panel c. Specific finding with quantitative anchor.
+
+n = N biologically independent samples. Data are mean ± s.d.
+P < 0.001 by two-sided Student's t-test. Scale bar, 50 μm.
+```
+
+## Rules
+
+### Headline (after `Fig. N |`)
+- Sentence-case or Title Case (Nature uses Title Case).
+- One phrase summarizing the figure, NOT a generic label.
+- GOOD: `Fig. 1 | Hole correlations beyond nearest neighbours.`
+- BAD: `Fig. 1 | Results.`
+- BAD: `Fig. 1 | The binding affinity of X to Y.`
+
+### Panel descriptions
+- Lowercase letter + period + space + description.
+- Each panel: what is shown, key quantitative result, statistical test if applicable.
+- Start each panel with action verb in past tense (`Shown is`, `Plotted are`, `Measured`) or noun phrase (`Heat map of ...`, `Bar plot of ...`).
+- Avoid: `As shown in panel a, ...` — the panel label `a,` already signals what follows.
+
+### Quantitative anchors (every panel where applicable)
+- n value: `n = 3 biological replicates`, `n = 152 patients`.
+- Statistics: `P = 0.003`, `two-sided t-test`.
+- Error bar: `mean ± s.d.`, `median ± IQR`.
+- Scale bar for microscopy: `Scale bar, 10 μm.`
+
+### Layout
+- Each figure caption is ~50-150 words (multi-panel: up to 300 words).
+- End with stats, scale bars, and any abbreviations defined inline.
+- ONE figure = ONE caption. Extended Data Figs have separate captions but follow same format.
+
+## Anti-patterns
+
+- `This figure shows the results of X.` (vague)
+- `As can be seen from panel a, ...` (AI-tell)
+- `For more details, see the text.` (figure must be standalone)
+- Generic labels like `Fig. 1 | Data.`
+- Burying stats in figure rather than caption
+- Repeating the title in the panel descriptions
+
+## Examples
+
+GOOD:
+```
+Fig. 1 | Hole-hole correlations beyond nearest neighbours.
+
+a, Two-dimensional density map of doubly-occupied sites as a function of
+   doping δ at temperature T = 0.5 t.
+b, Normalized hole-hole correlation function C(d) versus distance d for
+   δ = 0.111 (red) and δ = 0.25 (blue).
+c, Phase diagram of the mixD Fermi-Hubbard model, indicating the
+   stripe precursor region (shaded).
+
+Data are mean ± s.d. across n = 4 independent measurements.
+```
+
+BAD:
+```
+Fig. 1 | Results of hole correlations.
+
+This figure shows the hole correlations. Panel a is the density map.
+Panel b is the correlation function. Panel c is the phase diagram.
+As can be seen, the data are interesting.
+```
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.

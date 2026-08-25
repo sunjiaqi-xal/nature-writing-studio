@@ -1,0 +1,13 @@
+pattern_id	name	section_sequence	nature_variant	paper_count	note
+SP001	nature_full	abstract->introduction->results->discussion->methods	abstract first; methods LAST (Nature house style, opposite of many journals)	306	full-length Nature research article (most common)
+SP002	nature_letter	introduction->results->discussion->methods	abstract not separate section (in-line first paragraph); methods last	126	Nature Letter format (concise)
+SP003	nature_compact	introduction->results->methods	abstract may be inline; methods last; no discussion section	48	brief report / Nature Letter short form
+SP004	nature_methods_first	abstract->introduction->methods	brief methods-only paper; rare in Nature	37	rare; e.g., methods-focused resources
+SP005	nature_minimal	abstract->introduction->results->methods	short format without discussion	157	medium-length without discussion
+SP006	nature_brief_methods	abstract->results->discussion->methods	abstract + results + discussion + methods only; intro inline	37	short report
+SP007	nature_methods_heavy	abstract->introduction->discussion->methods	heavy methods, light results	25	methods-led paper
+SP008	nature_mini	results->discussion->methods	short result-only paper	7	very short format
+SP009	nature_full_no_methods	abstract->introduction->results->discussion	supplementary methods only	2	open methods
+SP010	nature_mini_methods_first	abstract->methods	rarified in Nature (rare)	1	outlier
+SP011	nature_letter_short	abstract->introduction->results->methods	short letter format	157	common brief report
+SP012	nature_letter_micro	abstract->introduction->methods	shortest standard format	37	very brief

@@ -1,0 +1,177 @@
+# Multi-Section Orchestrator — Nature Portfolio Full-Paper Rewrite
+
+Use when `target=multi_section`. Accepts a single full draft (Chinese or English) and produces per-section JSONs plus a meta-summary that an external agent can stitch into a complete Nature-style paper.
+
+## Goal
+
+Take one author-supplied draft, derive a logical line and entity registry, auto-select the section sequence, invoke the per-section prompts with shared context, and emit cross-section audit metadata. **Do not invent section structure from scratch**; follow the SP001-SP012 templates in `knowledge/paper_story_patterns.tsv`. **Do not stitch prose**; the orchestrator returns per-section JSONs and a meta object. The agent (or human-facing layer) performs the final concatenation.
+
+## Hard prereq (cannot skip)
+
+Before any section writing, emit three artefacts:
+
+1. `logic_line` — one sentence stating the paper's central claim.
+2. `story_arc` — a one-line role description for each section in the chosen version (e.g., abstract: "lead with method + headline finding"; introduction: "broad context + gap + approach preview"; results: "descriptive + mechanistic"; discussion: "restate + interpret + limit + outlook"; methods: "enable replication").
+3. `entity_registry` — every number, abbreviation, gene, species, accession, dataset, sample size, statistical test, and named biological entity mentioned anywhere in the input draft. Each entry: `{name, kind, canonical_form, expansion_if_known, first_section}`.
+
+If the input is too sparse to derive any of these, mark `[TBD]` and append `input_too_sparse` to `meta.degraded` (array). Do not fabricate.
+
+## Auto-version-selection
+
+Default heuristic (agent may override via explicit `version=SP00X` field):
+
+| input length | structural cues | version |
+|---|---|---|
+| >= 800 words | mentions abstract, intro, results, discussion, methods | SP001 (`abstract -> introduction -> results -> discussion -> methods`) |
+| 400-800 words | mentions results + methods only, no discussion | SP005 (`abstract -> introduction -> results -> methods`) |
+| <= 600 words | no separate methods discussion, condensed | SP002 (`introduction -> results -> discussion -> methods`, inline abstract) |
+| brief report, < 500 words, methods-heavy | methods-dominant | SP011 (`abstract -> introduction -> results -> methods`) |
+
+If ambiguity, default to SP001 and flag in `meta.version_used = "SP001 (default)"`.
+
+## Shared context (informal schema)
+
+```
+{
+  "logic_line": "<single sentence>",
+  "story_arc": {
+    "abstract": "<role>",
+    "introduction": "<role>",
+    "results": "<role>",
+    "discussion": "<role>",
+    "methods": "<role>"
+  },
+  "entity_registry": [
+    {"name": "Illumina HiSeq 2500", "kind": "instrument", "canonical_form": "Illumina HiSeq 2500", "expansion_if_known": null, "first_section": "abstract"},
+    ...
+  ],
+  "hedge_ladder": {
+    "abstract": "causal",
+    "introduction": "associative -> causal",
+    "results": "causal",
+    "discussion": "associative -> speculative",
+    "outlook": "speculative"
+  },
+  "citation_slots": {"1": "[1]", "2": "[2]", ...}
+}
+```
+
+## Per-section invocation recipe
+
+For each section in the chosen version, in order:
+
+1. Slice the original input draft for that section. If the input has no explicit section markers, use length + position heuristics (e.g., first 200 words -> abstract; next 500 -> intro; middle -> results; tail 400 -> discussion + methods).
+2. Construct the section input as: `[shared_context fence] + [section slice]`.
+   - Fenced shared-context block at the top, marked `--- shared_context ---` ... `--- end shared_context ---`.
+   - Below the fence, the original draft slice (Chinese or English) for that section.
+3. Invoke the matching section prompt as if `target=<abstract|introduction|results|discussion|methods>`. Pass the constructed section input.
+4. Collect the per-section JSON output: `{text, text_compact, summary}`.
+5. Run the existing Verification Layer (system_writer.txt Rule 9 (Verification Layer)) on that section's `text` and `text_compact` independently.
+6. If verification fails OR a new entity appears in the output not in `entity_registry`: DROP the entity from the section's `text` / `text_compact` (do NOT add it to the registry — that is fabrication by another name). Re-invoke that section once with the corrected context. After two failed attempts, see the failure mode below.
+
+## v3 TSV usage in per-section rewrites
+
+When invoking each section prompt, the orchestrator should load these 5 v3 deterministic TSVs (in addition to the v2.0.1 set) so each section's rewrite can be calibrated against real Nature-family priors:
+
+| section target | primary v3 TSV | usage |
+|---|---|---|
+| abstract | opener_distribution.tsv (abstract rows) | pick first-sentence opener (top: "here we" / "we find" / "these results") |
+| abstract / introduction | gap_transitions.tsv | pick pivot word + template to frame the gap sentence (top pivots: although, however, but, yet, while, whereas, despite, nevertheless) |
+| introduction | opener_distribution.tsv (introduction rows) + cross_section_linkers.tsv (intro->results) | lead with "here we" / "we asked" and bridge to results via "Having established X, we next asked whether Y" |
+| results | results_discussion_openers.tsv + opener_distribution.tsv (results rows) | open each result subsection with a calibrated template; "To characterize X, we performed Y" |
+| results / discussion | hedge_verbs.tsv | enforce causal -> associative -> speculative tier progression; "suggest" (associative, 1645/409 papers) for results caveats |
+| discussion | cross_section_linkers.tsv (results->discussion) + results_discussion_openers.tsv | bridge with "These results suggest that X" (26 papers) |
+| methods | opener_distribution.tsv (methods rows) | "we performed" / "samples were" / "data were" patterns |
+
+Use these as priors, not templates to copy verbatim. Instantiate the X/Y/Z placeholders with the user's specific finding.
+
+## Cross-section audit (after all sections complete)
+
+Apply the rules in `knowledge/cross_section_rules.tsv`:
+
+| check | rule | what to flag |
+|---|---|---|
+| entity_diff | X002 | any number / abbreviation / gene / species that appears differently across sections |
+| hedge_violations | X001, X007 | any section whose hedge tier is stronger than the section before it on the same underlying claim |
+| citation_gaps | X003 | any citation number that is skipped (e.g., [1], [3] with no [2]) or reused |
+| abbreviation_drift | X004 | any abbreviation whose first-expansion placement differs across sections |
+| transition_breaks | X006 | any section whose lead sentence does not reference the previous section's closing claim or entity |
+| numeric_format_drift | X009 | any 10+ number spelled out or any 1-9 numeral misused |
+| reference_density | X010 | intro < 5 or > 12 citations; results > 2 own-data citations; discussion > 1 citation per paragraph |
+
+Emit `meta.cross_section = {entity_diff: [...], hedge_violations: [...], citation_gaps: [...], abbreviation_drift: [...], transition_breaks: [...], numeric_format_drift: [...], reference_density: [...], overall: "PASS" | "FAIL"}`.
+
+## Failure modes and fallbacks
+
+- Input < 200 words: emit a single warning + fall back to `target=abstract` with the entire input as the abstract draft. Append `input_too_sparse_for_multi_section` to `meta.degraded`.
+- Ambiguous version: default SP001, log `meta.version_used = "SP001 (default)"`.
+- Verification fails on a section twice: STOP. The rewritten section has untraceable tokens (fabrication). Do NOT emit it. Set that section's `text` and `text_compact` to `null` in the output JSON, list the untraceable tokens in `summary.untraceable_tokens`, and add `fabrication_blocked` to `meta.degraded` (array form). Continue with the remaining sections. The downstream agent must skip null sections during stitching.
+- No `entity_registry` derivable from input: emit empty registry, append `no_entities_detected` to `meta.degraded`, allow `[TBD — abbreviation to define]` placeholders in section outputs.
+
+## Output contract
+
+Return one JSON object with two top-level keys:
+
+```json
+{
+  "sections": [
+    {"section": "abstract", "text": "<...>", "text_compact": "<...>", "summary": {"logic_line": "<...>", "rules_applied": ["..."], "patterns_used": ["..."], "ai_tells_avoided": ["..."], "section": "abstract", "domain": "<...>", "untraceable_tokens": []}},
+    {"section": "introduction", "text": "<...>", "text_compact": "<...>", "summary": {...}},
+    ... (one entry per section in version order)
+  ],
+  "meta": {
+    "version_used": "SP001",
+    "logic_line": "<single sentence>",
+    "entity_registry": [...],
+    "cross_section": {"entity_diff": [], "hedge_violations": [], "citation_gaps": [], "abbreviation_drift": [], "transition_breaks": [], "numeric_format_drift": [], "reference_density": [], "overall": "PASS"},
+    "degraded": [] | ["<reason>", ...]   // array of degradation flags; empty = clean
+}
+```
+
+The agent (or human-facing layer) is responsible for:
+
+1. Iterating `sections` in order.
+2. Concatenating each section's `text` (separated by `\n\n`) to produce one final `text`.
+3. Concatenating each section's `text_compact` (separated by `\n\n`) to produce one final `text_compact`.
+4. Presenting both stitched versions to the user, alongside `meta.cross_section` for transparency.
+
+## Anti-patterns specific to multi-section
+
+- Do not emit section outputs before `logic_line` + `story_arc` + `entity_registry` are non-empty (or all marked `[TBD]`).
+- Do not invent entities not traceable to the original draft; always check `entity_registry` first.
+- Do not strengthen hedges backward (X001); if results use `demonstrate`, discussion must use `suggest` / `support` / `may`, never back to causal.
+- Do not split a single number across sections as `92,738` vs `ninety-three thousand`; lock the canonical form at registry time.
+- Do not insert cross-section transition sentences inside a section's `text`; transitions are the agent's responsibility during stitching.
+
+## Self-check before returning
+
+- [ ] `logic_line` is exactly one sentence.
+- [ ] `story_arc` has one entry per section in the chosen version.
+- [ ] `entity_registry` contains every number, abbreviation, gene, species, and accession from the input.
+- [ ] Per-section JSONs are in version order.
+- [ ] Per-section `text` and `text_compact` each pass Verification Layer independently, AND every section's `summary.untraceable_tokens` is `[]` (empty array). Non-empty `untraceable_tokens` means fabrication was detected; that section's `text` / `text_compact` must be `null` (see Failure Modes).
+- [ ] `meta.degraded` is an array (empty array `[]` = clean; non-empty = list of degradation flags). Verify no `meta.degraded` entry was silently set to emit a fabrication-prone section.
+- [ ] No em-dash (U+2014) anywhere in `sections[].text` or `sections[].text_compact` — run `strip_em_dash()` (system_writer.txt Rule 2.5) per section, deterministically.
+- [ ] Hedge tier descends monotonically (or stays equal) across sections in version order.
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.

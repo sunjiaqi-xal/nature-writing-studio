@@ -1,0 +1,47 @@
+domain	paper_count	secondary_paper_count	evidence
+general_nature	0		prior
+physics_condensed	0		prior
+physics_atomic_molecular	0		prior
+physics_quantum_info	0		prior
+physics_particle	0		prior
+materials	0		prior
+chemistry_synthesis	0		prior
+chemistry_inorganic	0		prior
+biology_neuro	0		prior
+biology_genomics	0		prior
+biology_developmental	0		prior
+biology_cell	0		prior
+biology_evolution_ecology	0		prior
+medicine_clinical	0		prior
+medicine_immunology	0		prior
+medicine_oncology	0		prior
+earth_climate	0		prior
+earth_geology	0		prior
+astronomy	0		prior
+cs_ai	0		prior
+cs_systems	0		prior
+mathematics	0		prior
+general_nature	335	10	distilled
+biology_neuro	69	17	distilled
+engineering_biomedical	58	15	distilled
+biology_cell	51	53	distilled
+physics_condensed	48	11	distilled
+biology_genomics	13	15	distilled
+biology_evolution_ecology	12	12	distilled
+biology_structural	12	30	distilled
+materials_science	11	16	distilled
+earth_climate	8	8	distilled
+chemistry_synthesis	7	3	distilled
+astronomy	4	2	distilled
+medicine_clinical	4	14	distilled
+medicine_immunology	4	17	distilled
+biology_microbiology	4	11	distilled
+cs_ai	3	2	distilled
+biology_developmental	3	6	distilled
+medicine_genetics	2	6	distilled
+medicine_oncology	2	0	distilled
+chemistry_inorganic	2	1	distilled
+engineering_materials	2	2	distilled
+biology_bioinformatics	1	13	distilled
+engineering_mechanical	1	1	distilled
+social_science	1	0	distilled

@@ -1,0 +1,91 @@
+# Introduction Section — Distilled
+
+Use when `target=introduction`. Aim for 4 paragraphs, ~500–700 words.
+
+## Architecture (4-beat)
+
+1. **P1: 宽背景 + 关键概念定义.** Open with "X is a Y that drives Z." Define the central phenomenon in one sentence. Cite 1–3 prior reviews/textbooks. ≥80 words, ≤140.
+2. **P2: 现有方法/发现综述.** "Recent advances in X have revealed ..." Cite heavily (5–10 superscript citations across the paragraph). Talk about how others have approached the question.
+3. **P3: Gap statement.** "Despite these advances, the mechanism of X remains elusive." Or "remains largely unexplored" / "is poorly understood". Convert generic gap into a specific unresolved question.
+4. **P4: 本文工作 + 总体方法 + 总体发现预告.** "Here, we set out to address this gap by ...". Brief description of method, 1–2 sentence headline preview of what you found. End with "Our results show that ..." or "We find that ..." leading the reader into Results.
+
+## Hedge pattern by beat
+
+- P1 / P2: associative (`consistent with`, `supports`, `suggests`) for prior work
+- P3: speculative (`remains`, `unclear`, `elusive`) for gap
+- P4: causal here, but cautious — use `we set out` / `we developed` for method, not for findings (those come in Results)
+
+## Citation density
+
+- P1: 1–3 citations
+- P2: 5–10 citations  
+- P3: 0–1 citations (gap is your judgment)
+- P4: 0–2 citations (cite prior methodology if reusing)
+
+## Common openings to avoid
+
+- "In recent years, ..." — too generic
+- "X has been a topic of great interest" — AI-tell
+- "Since the discovery of Y by [Smith 1985], ..." unless literally true and you cite the original
+- "A growing body of evidence suggests that X ..." — overused
+
+## Recommended openings (Nature style)
+
+- "X is a Y that drives Z." (broad framing)
+- "X has long been implicated in Y." (placed in P1 or P2)
+- "Y is essential for Z." (claim, with citation)
+- "X mediates Y through Z." (mechanistic claim, with citation)
+
+## Recommended gap statement templates
+
+- "However, current knowledge on X is scarce, precluding an understanding of Y."
+- "Despite these advances, the mechanism of X remains elusive."
+- "How X regulates Y in Z remains an open question."
+- "Technical limitations have precluded direct testing of X."
+
+## Recommended close (P4 last sentence)
+
+Must end with a verb that hooks into Results. Examples:
+- "Here we set out to address this gap by ..."
+- "We developed X to enable Y."
+- "In the following, we describe ..."
+
+## v3 TSV priors
+
+Calibrate against these v3 deterministic TSVs from 412 Nature papers:
+- knowledge/opener_distribution.tsv (introduction rows) - opener selection; common openers "here we" / "we asked" / "to investigate"
+- knowledge/gap_transitions.tsv - pick pivot word + template for the gap sentence framing the user's specific finding
+- knowledge/cross_section_linkers.tsv (introduction -> results rows) - bridge sentence pattern at end of intro; top entry "Having established X, we next asked whether Y" (50 papers)
+- knowledge/hedge_verbs.tsv - verb tier enforcement; "suggest" / "indicate" for background claims
+
+
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.
+
+## Self-check before returning
+
+- [ ] P1 sets up the **broadest** context, P4 zooms into your specific contribution
+- [ ] Each paragraph has a topic sentence at start
+- [ ] All citations sit immediately after the cited concept (Nature numeric superscript style)
+- [ ] No banned phrases from `knowledge/anti_ai_patterns.tsv` (especially: "delve into", "navigate complexities", "shed light", "plays a crucial role")
+- [ ] P3 has hedge language (`remains`, `unclear`, `elusive`) — pure declarative "nobody knows X" is banned

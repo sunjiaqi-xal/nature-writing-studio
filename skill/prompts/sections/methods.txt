@@ -1,0 +1,82 @@
+# Methods Section — Nature Standard
+
+Goal: enable independent replication. Written in **past passive**, third-person. Methods appears LAST in Nature research articles (unusual — most journals put it second). Often subdivided with bolded subsection headers.
+
+## Architecture (typical subsection order)
+
+### Subjects / Samples
+- Source, n, ethics approval.
+- `Samples were collected from N participants after written informed consent.`
+- For animal studies: species, strain, age, sex, supplier.
+- For cell lines: source, authentication, mycoplasma testing.
+
+### Experimental setup / Materials
+- Reagents with vendor and catalog number (e.g., `anti-HA antibody (Cell Signaling, C29F4, 1:1000)`).
+- Equipment with model (e.g., `LSM 980 confocal microscope (Zeiss)`).
+- Software with version (e.g., `ImageJ v2.3.0`).
+
+### Data acquisition
+- Step-by-step procedure as the author would do it.
+- Parameters (temperature, time, concentration, pH).
+- Number of replicates (biological vs technical — specify).
+
+### Data processing / Statistical analysis
+- Software + version.
+- Test used, with reason.
+- `P values were calculated using a two-sided X test.`
+- `Data are mean ± s.d. of N independent experiments.`
+- `P < 0.05 was considered significant.` (often required for clarity)
+- Multiple-comparison correction if applicable.
+
+### Ethics / Compliance
+- `All experiments were approved by the Institutional Review Board of [Institution].`
+- Animal: `All animal procedures were approved by the [Committee] (protocol number).`
+
+### Data and code availability (REQUIRED)
+- `Data are available at [GEO/SRA/PDB accession] under accession [ID].`
+- `Source data are provided with this paper.`
+- `Custom code is available at [GitHub/Zenodo link].`
+- `Any additional information required is available from the corresponding author upon reasonable request.`
+
+## Hard rules
+
+- **Past tense throughout.** `Cells were transfected`, NOT `We transfected cells`.
+- **Third-person passive OR first-person passive acceptable.** Both common in Nature.
+- Specify n for every measurement (n = 3 biological replicates, n = 150 patients, etc.).
+- Include enough detail that another lab could replicate.
+- Reference previously published methods: `as described previously1.`
+- Avoid AI-tells:
+  - `We utilized ...` → `We used ...`
+  - `Commence ...` → `Start / begin / [verb]`
+  - `It is important to note that ...` → DELETE; just state
+  - `In order to ...` → `To ...`
+
+## Anti-patterns
+
+- `We made use of ...` → `We used ...`
+- `A standard protocol was employed for ...` → `Samples were processed using the protocol of Smith et al.1.` (cite)
+- `The samples were subjected to ...` (over-formal) → `The samples were analysed by ...`
+- Mixing past and present tense within a paragraph.
+- Omitting replicate counts.
+
+## Output format
+
+Unless the user explicitly asks for JSON or a file write, return **inline Markdown** in this exact shape (no surrounding `{` `}` braces, no DOCX / .md file):
+
+```markdown
+## text
+<Nature-level prose, full version>
+
+## text_compact
+<tighter 60-70% length version>
+
+## summary
+- section: <abstract | introduction | methods | results | discussion | figure_legend | sentence | multi_section>
+- domain: <one of the 22 domain_register.tsv values, or general_nature>
+- logic_line: <1-2 sentences explaining the rewrite strategy>
+- rules_applied: [R001, R005, ...]
+- patterns_used: [P010, P013, ...]
+- ai_tells_avoided: [delve_into, navigate_complexities, ...]
+```
+
+Switch to JSON only if the user says "output as JSON" or "give me the JSON". Switch to DOCX / .md file only if the user says "save to .docx" or "write to a file". Default is inline Markdown, conversation-only.

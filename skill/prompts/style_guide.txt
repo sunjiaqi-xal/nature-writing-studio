@@ -1,0 +1,115 @@
+# Nature Style Guide — distilled from 750 Nature Portfolio papers
+
+## Hedge Tiers (use one per claim)
+
+| Tier | Verbs / Modals | Use when |
+|---|---|---|
+| **Causal** | `we demonstrate / show / identify / establish / report that` | Author's own data with controlled comparison |
+| **Associative** | `consistent with / in line with / supports / suggests / our data are consistent with` | Correlative data without controlled comparison |
+| **Speculative** | `may / could / might / appears to / one possibility is` | Proposed mechanism, hypothesis, indirect evidence |
+
+## Sentence Templates (per section)
+
+### Abstract (≤ 200 words, often ≤ 150)
+- Background: `X is a Y that drives Z.`
+- Gap: `However, the role/mechanism of X remains unclear.`
+- Method: `Here, by/using/in X, we [verb] Y.`
+- Lead finding: `We find/show/identify that X ... (Fig. X).`
+- Integrative: `Together, our findings reveal that ...`
+- Closing: `Our study provides a framework for X / establishes X as a mechanism of Y.`
+
+### Introduction
+- P1 broad: `X is the Y that drives Z. ... X has been implicated in Y1,2.`
+- P2 background: `Previous studies have shown that X ...`
+- P3 gap: `Despite these advances, the mechanism of X remains elusive.`
+- P4 aim: `Here we developed X to enable Y. ... We find that ...`
+
+### Results
+- Lead: `We find that X ... (Fig. 1a).`
+- Quant: `X was N-fold higher than Y (P < 0.001, two-sided t-test).`
+- Control: `To rule out X, we performed Y.`
+- Transition: `Having established X, we next asked whether Y.`
+
+### Methods (past passive)
+- `Samples were collected from N participants.`
+- `Data were analysed using X (v1.2.3).`
+- `All experiments were approved by the IRB of [Institution].`
+
+### Discussion
+- P1 restate: `Our data suggest that X ...`
+- P2 mechanism: `Mechanistically, this may reflect X.`
+- P3 limit: `We note that our analysis is limited to X.`
+- P4 outlook: `It will be important to test X in Y.`
+
+### Figure Caption
+- `Fig. N | Title-Case Statement of What Is Shown.`
+- `a, Description of panel a. b, Description of panel b.`
+- Stats: `n = N biologically independent samples. P < 0.001 by two-sided t-test.`
+- Scale: `Scale bar, X μm.`
+
+## Numerals
+
+- Spell out 1-9 in running text (`three replicates`).
+- Numerals for 10+ (`152 streams`, `44 TFs`).
+- Always numerals in statistics, units, figure callouts.
+- Percent: `52%` (no space). Temperature: `5 °C` (with space).
+
+## Citations
+
+- Numeric superscript: `circuit3–8` (Nature style).
+- Group consecutive: `1–5`. Non-consecutive: `1,3,5`.
+- Cite immediately after concept, not at sentence end.
+
+## Banned Phrases (sample — full list in `knowledge/anti_ai_patterns.tsv`)
+
+`delve into` · `navigate the complexities` · `intricate landscape` · `tapestry` · `shed light on` · `realm of` · `in today's world` · `plays a crucial/pivotal role` · `cutting-edge` · `state-of-the-art` · `groundbreaking` · `paradigm shift` · `leverage` · `in this paper/study` · `the authors` · `it is important to note` · `we believe` · `due to the fact that` · `in order to` · `broadly speaking` · `key player` · `key insight` · `crucial step` · `pave the way` · `broad implications` · `unprecedented` · `breakthrough` · `key question` · `in conclusion` · `as previously demonstrated`
+
+## Quick Sanity Check Before Returning
+
+- Lead sentence of each paragraph states the claim? ✓
+- Every non-trivial claim has a figure/data anchor or hedge? ✓
+- No banned phrases from `anti_ai_patterns.tsv`? ✓
+- Numerals follow Nature house style? ✓
+- Citation numbers are superscript-style? ✓
+- Sentence rhythm varied (short <15 + medium 15-25 + long 25-50+ interleaved, not uniform)?
+- Methods in past passive? ✓
+- Discussion restates finding first, then mechanism, then limit, then outlook? ✓
+
+
+---
+
+## Provenance (v2, distilled 2026-07-21)
+
+- Auto-replaced any hardcoded '18-25 words' with post-aggregated reality
+- Banned-phrases section reflects adversarial Phase 2.5 outputs (when run)
+- See ../knowledge/PROVENANCE.md
+
+
+## Cross-section hedge ladder (multi-section writing only)
+
+When `target=multi_section`, hedge tier must soften (or stay equal) as the section index advances. The canonical ladder from `knowledge/cross_section_rules.tsv` (X001):
+
+| section | tier | example verb / modal |
+|---|---|---|
+| abstract (lead finding) | causal | `We find / show / identify / demonstrate that X.` |
+| introduction (P1-P2, prior work) | associative | `X has been implicated in Y; consistent with Z.` |
+| introduction (P4, own approach preview) | causal | `We developed X to enable Y.` |
+| results (own data) | causal | `We find / show / demonstrate that X.` |
+| discussion (mechanism) | associative | `This is consistent with the notion that X.` |
+| discussion (outlook) | speculative | `X may / could contribute to Y.` |
+
+Hedge can stay equal across adjacent sections (results causal -> discussion associative is a *softening*; results causal -> introduction causal is forbidden because introduction precedes results). Never strengthen backward (X001). Same underlying claim must carry the same tier across abstract / intro / results / discussion (X007).
+
+## Cross-section entity continuity (multi-section writing only)
+
+Every number, abbreviation, gene, species, accession, and named biological entity in the input draft must be registered up front in `entity_registry` and then appear byte-identically in every section that mentions it (X002). Abbreviation expansions (X004):
+
+- First occurrence in the entire paper = full term + parenthetical abbreviation.
+- Later occurrences = abbreviation only.
+- Same expansion placement decision across all sections.
+
+Citation numbering (X003):
+
+- Numeric superscripts assigned in order of first mention in the whole paper, not per-section.
+- Never reuse a number; never skip a number.
+- Citation density (X010): intro 5-10/section, results 0-2 (own data), discussion 1/paragraph.
