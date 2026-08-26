@@ -34,49 +34,61 @@ nature-writing-studio/
 
 ## Codex 调用示例
 
-```md
-$nature-writing-studio 把下面这段中文改写为 Nature 风格的英文：
-我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化。
 
-$nature-writing-studio 帮我把整篇草稿按 Nature 格式编排（abstract→introduction→results→discussion→methods）：
-"input: <约 350 字中文草稿>
-target: multi_section
-domain: biology_genomics"
+
+
+```markdown
+提示词：
+$Nature Writing Studio 把下面这句话改写为英文：我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化。
 ```
 
-## 功能
 
-skill 围绕三个核心设计展开。下文按 **核心设计 → 输出格式 → 调用方式** 三段展开。
 
-### 三大核心设计
+每个调用都返回**三件套**：
+
+| 字段 | 含义 | 何时用 |
+|---|---|---|
+| `text` | 正文（Nature 风格英文） | 直接用于投稿 / 润色稿 |
+| `text_compact` | 紧凑版（60–70% 长度） | 投稿字数限制 / 快速预览 |
+| `summary` | 改写元信息：用了哪些规则、避开了哪些 AI-tell、所属章节与领域 | 自查 / debug |
+
+示例如下：
+
+<img width="582" height="577" alt="image" src="https://github.com/user-attachments/assets/113e5887-4f3c-4abe-8b8f-79ea7d7c182d" />
+
+
+
+## 核心设计与功能
+
+skill 具有四大核心设计，具体如下：
+
 
 #### ① 真实 Nature 文章蒸馏
 
 不做 LLM 自由发挥，而是从 Nature 正刊文章中按节抽取真实的写作模式，再按节级上下文挑出最匹配的句式。具体抓五类信号：
 
-- **节首 3-gram**（`opener_distribution.tsv`，10488 行）—— 比如 abstract 节首最高频是 `here we`（279 篇论文中出现）。
-- **节内转折模板**（`gap_transitions.tsv`，1668 行）—— 比如 introduction 中 `Although X, Y.` 出现 15 篇 / 15 篇。
-- **动词按证据强度分档**（`hedge_verbs.tsv`，124 行）—— causal（强）→ `show` / `demonstrate` / `identify`；associative（中）→ `suggest` / `indicate` / `support`；speculative（弱）→ `may` / `could` / `possibly`。
-- **跨节衔接模板**（`cross_section_linkers.tsv`，1766 行）—— 比如 intro → results 的 `Having established X, we next asked whether Y`（50 论文）。
-- **results 段开头句**（`results_discussion_openers.tsv`，4864 行）—— 比如 `To characterize X, we performed Y`。
+- **节首 3-gram**（10488 种）—— 比如 abstract 节首最高频是 `here we`（279 篇论文中出现）。
+- **节内转折模板**（1668 种）—— 比如 introduction 中 `Although X, Y.` 出现 15 篇 / 15 篇。
+- **动词按证据强度分档**（124 种）—— 比如 causal（强）→ `show` / `demonstrate` / `identify`；associative（中）→ `suggest` / `indicate` / `support`；speculative（弱）→ `may` / `could` / `possibly`。
+- **跨节衔接模板**（1766 种）—— 比如 intro → results 的 `Having established X, we next asked whether Y`（50 论文）。
+- **results 段开头句**（4864 种）—— 比如 `To characterize X, we performed Y`。
 
-合计 19,378 行 pattern，spot-check 抽 18 行随机验证 89% 通过（LCS ≥ 0.5）。
+合计 19,378 种写作模式。
 
-#### ② 反 AI 用词对抗学习
+### ② 逻辑线提炼
 
-LLM 在模仿 Nature 风格时总会带一些"AI 味"短语。我们从 LLM 冒充 Nature 风格的文章中抽出 136 条 AI-tell，skill 改写时**永远禁用**。分三级：
+基于 input 的可识别结构（方法 + 发现 + 意义）映射出来的写作逻辑（logic_line），并且显式输出到summary中。
 
-| 等级 | 数量 | 典型例子 |
-|---|---|---|
-| **严重 AI-tell**（必须替换） | 40 | `delve into` / `navigate the complexities of` / `shed light on` / `key role in` |
-| **替换词 AI-tell**（优先换回基础词） | 127 | `leverage` / `utilize` / `robust` / `comprehensive` |
-| **轻微 AI-tell**（润色掉即可） | 124 | `It's worth noting that` / `Importantly` / `It is important to note` |
+比如上面的输入例子：我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化。
 
-执行机制在 [验收层](#验收层verification-layer)——不是软规则，是 hard post-process。
+输出 text 是："Here we applied CRISPRi screening to a panel of 287 transcription factors (TFs) and identified ZNF219, a previously uncharacterized TF, as a repressor of neural differentiation."
+
+对应的 logic_line输出是："screen → single hit → mechanism"
+
 
 #### ③ 分模块写作 + agent 自动识别
 
-skill 不是一锅端改全文，而是按论文模块独立改写。`multi_section` 模式下 agent 会**自动**根据 input 的章节标题、长度、关键词判断要改写哪些模块，无需用户手动指定：
+skill 不是一锅端改全文，而是按论文模块独立改写（自动识别）。另外提供 `multi_section` 模式，agent 会**自动**根据 input 的内容改写完整多端文章：
 
 | 模块 | 用途 | 输入长度建议 |
 |---|---|---|
@@ -87,50 +99,39 @@ skill 不是一锅端改全文，而是按论文模块独立改写。`multi_sect
 | `discussion` | 讨论改写 | 300–600 字 |
 | `figure_legend` | 图注改写 | 50–150 字 |
 | `sentence` | 句级打磨（最短输入） | 任意 |
+| `multi_section` | 多个段落内容 | 任意 |
 
-例如 multi_section 模式下输入一篇 800 字的中文草稿，agent 自动识别到这是"results + discussion"类型，套用 SP005 版式（results + discussion 串写），不会硬塞 abstract。
+multi_section 模式下输入一篇 800 字的中文草稿，agent 自动识别到这是"results + discussion"类型，套用 SP005 版式（results + discussion 串写），不会硬塞 abstract。
 
-### 输出格式
 
-每个调用都返回**三件套**：
+#### ④ 基于对抗学习避免 AI 用词
 
-| 字段 | 含义 | 何时用 |
+LLM 在模仿 Nature 风格时总会带一些"AI 味"短语。我们基于 30 篇真实文章的内容逻辑，让 LLM 进行重新写作。根据真实文章的内容作为阴性对照，从 LLM 写作的文章中抽出了 136 条 AI-tell（AI常用用词），skill 改写时**永远禁用**。分三级：
+
+| 等级 | 数量 | 典型例子 |
 |---|---|---|
-| `text` | 正文（Nature 风格英文） | 直接用于投稿 / 润色稿 |
-| `text_compact` | 紧凑版（60–70% 长度） | 投稿字数限制 / 快速预览 |
-| `summary` | 改写元信息：用了哪些规则、避开了哪些 AI-tell、所属章节与领域 | 自查 / debug |
+| **严重 AI-tell**（必须替换） | 40 | `delve into` / `navigate the complexities of` / `shed light on` / `key role in` |
+| **替换词 AI-tell**（优先换回基础词） | 127 | `leverage` / `utilize` / `robust` / `comprehensive` |
+| **轻微 AI-tell**（润色掉即可） | 124 | `It's worth noting that` / `Importantly` / `It is important to note` |
 
-**示例**（把"我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化"按 `target=abstract` 改写）：
+执行机制在 [验收层](#验收层verification-layer)——不是软规则。
 
-```json
-{
-  "text": "Here we used CRISPRi screening across 287 transcription factors and identified ZNF219 as a previously uncharacterized repressor of neural differentiation.",
-  "text_compact": "We screened 287 TFs by CRISPRi and identified ZNF219 as a repressor of neural differentiation.",
-  "summary": {
-    "section": "abstract",
-    "domain": "biology_genomics",
-    "logic_line": "screen -> single hit -> mechanism",
-    "rules_applied": ["R001 主动语态", "R023 数字格式"],
-    "ai_tells_avoided": ["delve into", "navigate complexities", "shed light on", "leverage"]
-  }
-}
-```
 
 ### 调用方式
 
-两种调用模式，按需求选：
+两种调用模式，可以按需求选，也可以由agent自动识别模式：
 
 **单节改写（single_section）**：从 7 个 `target` 中选一个，传入对应章节的草稿，返回三件套。
 
-**整稿编排（multi_section，v2.0.1 新增）**：传入整篇草稿，agent 自动识别章节结构，按节改写并跑跨节一致性审计（X001–X010），返回每节 JSON + `meta` 对象（`version_used` / `logic_line` / `entity_registry` / `cross_section`）。
+**整稿编排（multi_section）**：传入整篇草稿，agent 自动识别章节结构，按节改写并跑跨节一致性审计（X001–X010），返回每节 JSON + `meta` 对象（`version_used` / `logic_line` / `entity_registry` / `cross_section`）。
 
 7 个 single_section 接口共享同一 prompt 模板 `prompts/sections/<target>.txt`；multi_section 走独立的编排器 `prompts/sections/multi_section.txt`。
 
-## 蒸馏产物详解
+## 蒸馏产物介绍
 
-逐个 TSV 一句话讲清 + 例子。所有数据来自 Nature 正刊文章抽取（详见上方三大核心设计 ①）。
 
-### 句式 / 衔接类（5 个 TSV）
+
+### 句式 / 衔接类
 
 | TSV | 一句话 | 例子 |
 |---|---|---|
@@ -140,7 +141,7 @@ skill 不是一锅端改全文，而是按论文模块独立改写。`multi_sect
 | `hedge_verbs.tsv`（124 行） | 动词按证据强度分档 | associative 档：`suggest`（1645 hits / 409 论文） |
 | `results_discussion_openers.tsv`（4864 行） | results / discussion 段开头句模板 | results：`To characterize X, we performed Y.`（21 hits / 12 论文） |
 
-### 论文结构 / 规则类（3 个 TSV）
+### 论文结构 / 规则类
 
 | TSV | 一句话 | 例子 |
 |---|---|---|
@@ -148,7 +149,7 @@ skill 不是一锅端改全文，而是按论文模块独立改写。`multi_sect
 | `cross_section_rules.tsv`（10 行） | 多节编排时的跨节一致性规则 | X001：hedge 不能由弱变强；abstract 用 causal，discussion 不能升级回 causal |
 | `inter_section_argue_chains.tsv`（21 行，v3.1 proto） | 3 步论证链（claim → evidence → hedge） | 实验型 paragraph：claim_verb=`show` → evidence_verb=`identify` → hedge_verb=`suggest` |
 
-### 写作规则 / 短语类（5 个 TSV）
+### 写作规则 / 短语类
 
 | TSV | 一句话 | 例子 |
 |---|---|---|
@@ -160,17 +161,10 @@ skill 不是一锅端改全文，而是按论文模块独立改写。`multi_sect
 
 13 个 TSV 共 19,378 行 pattern。每行都至少有一个 Nature 论文 DOI 作为来源锚点；改写时按节级上下文挑最匹配的句式，不靠 LLM 自由发挥。
 
-## 渲染输出契约
-
-- **每个 target 必产三件套**：`text` + `text_compact` + `summary`
-- **`multi_section` 多加一层 meta**：每节 JSON + `meta`（`version_used` / `logic_line` / `entity_registry` / `cross_section` 审计 / `degraded` flag）
-- **em-dash 零容忍**：`text` 与 `text_compact` 都不允许出现 U+2014（—）；`strip_em_dash()` 在验收层之后强制跑一次
-- **加粗策略**：只用于标题、表头、置信度行、引用锚点；正文不粗体
-- **不输出**：内部块（如"前言与合规说明"、"主张→证据映射"、"覆盖范围说明"、"对抗性自检"）不进文件，只在 skill 内部跑
 
 ## 验收层（Verification Layer）
 
-skill 改写后的最后一道闸，**5 条规则顺序固定**（在反 AI 自检之后、返回给用户之前跑）：
+skill 改写后，输出前会经过一个验收层，agent 对内容进行质检，避免出现捏造信息，**5 条规则顺序固定**：
 
 | 规则 | 作用 | 命中示例 |
 |---|---|---|
@@ -190,7 +184,7 @@ skill 改写后的最后一道闸，**5 条规则顺序固定**（在反 AI 自�
 
 白名单之外 token 一律需回溯；不能回溯即伪造。
 
-## 🤝 Contributions / 贡献
+## 🤝 Contributions
 
 欢迎提出问题、建议和提交 Pull Request！
 
