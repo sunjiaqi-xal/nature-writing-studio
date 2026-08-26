@@ -1,23 +1,20 @@
 # nature-writing-studio v2.0.1
 
-[简体中文](README.md) · **English (current)**
+**English (current)** · [简体中文](README.md)
 
-> Nature-style academic writing Skill: rewrite any scientific text (Chinese or English draft) into Nature main-journal-style English.
-> Distilled from **Nature main-journal articles (2025–2026)**; v2.0.1 adds a `multi_section` orchestration interface on top of v2.0.0 (2026-08-25: +96 paragraph-level bridges via v3 distillation).
+> Nature-style academic writing Skill: based on a knowledge base distilled from Nature-tier flagship papers, rewrites any scientific text (Chinese or English draft) into top-tier journal style English.
 
 ## One-line install
 
 In Codex, say:
 
 ```powershell
-Please install the Skill located at C:\Users\30768\.codex\skills\nature-writing-studio
+Please install the Skill located at https://github.com/mumdark/nature-writing-studio
 ```
 
-Total volume about **15 MB** (13 TSV knowledge bases + 10 prompts).
+Total size about **15 MB** (13 TSV knowledge bases + 10 prompts).
 
 ## Layout
-
-This repo root is for GitHub readers; the Codex skill entry lives under `skill/`.
 
 ```
 nature-writing-studio/
@@ -27,172 +24,151 @@ nature-writing-studio/
     ├── SKILL.md       <- Codex entry; all internal paths are relative to this directory
     ├── agents/openai.yaml
     ├── knowledge/     <- 13 TSVs
-    ├── prompts/       <- 9 prompts
+    ├── prompts/       <- 10 prompts
     ├── scripts/       <- sanity validator
     ├── docs/          <- roadmap
     ├── fixtures/      <- Chinese test fixture
     ├── CHANGELOG.md
 ```
 
-**Install into Codex**: copy the whole repo (or just the `skill/` subdir) to `~/.codex/skills/nature-writing-studio/`, keep the `skill/` subdirectory intact so Codex can locate the entry at `r0/nature-writing-studio/skill/SKILL.md`.
-
 ## Codex invocation examples
 
-```md
-$nature-writing-studio Rewrite the following Chinese to Nature-style English:
-"We used CRISPRi to screen 287 transcription factors and identified ZNF219, a previously uncharacterized TF that represses neural differentiation."
-
-$nature-writing-studio Help me orchestrate a full draft into Nature format (abstract→introduction→results→discussion→methods):
-"input: <about 350 Chinese characters>
-target: multi_section
-domain: biology_genomics"
+```markdown
+Prompt:
+$Nature Writing Studio Rewrite the following sentence to English: We used CRISPRi to screen 287 transcription factors and identified ZNF219, a previously uncharacterized transcription factor that represses neural differentiation.
 ```
 
-## Interfaces (target enum)
+Every call returns **three deliverables**:
 
-| Interface | Trigger | Output |
+| Field | Meaning | When to use |
 |---|---|---|
-| `abstract` | Single-section rewrite: abstract | `text + text_compact + summary` |
-| `introduction` | Single-section rewrite: introduction | same |
-| `methods` | Single-section rewrite: methods | same |
-| `results` | Single-section rewrite: results | same |
-| `discussion` | Single-section rewrite: discussion | same |
-| `figure_legend` | Single-section rewrite: figure legend | same |
-| `sentence` | Sentence-level polish (shortest input) | same |
-| `multi_section` (new in v2.0.1) | Full-draft orchestration | Per-section JSON + `meta` object (`version_used` / `logic_line` / `entity_registry` / cross-section audit) |
+| `text` | Main text (Nature-style English) | Directly for submission / polished draft |
+| `text_compact` | Compact version (60-70% length) | Submission word limits / quick preview |
+| `summary` | Rewrite metadata: which rules applied, which AI-tells avoided, section and domain | Self-check / debug |
 
-The 7 `single_section` interfaces share the same prompt template at `prompts/sections/<target>.txt`; `multi_section` runs `prompts/sections/multi_section.txt` as orchestrator and **does not pre-stitch prose** — the caller concatenates by SP format.
 
-## Distillation output map
+## Core design and functionality
 
-| Distilled artefact | Location | Purpose |
+The skill has four core designs, as follows:
+
+#### 1. Real Nature article distillation
+
+Rather than letting LLM improvise, the skill extracts real writing patterns from Nature flagship papers section by section, then picks the best-matching sentence templates based on section-level context. Specifically, five types of signals are captured:
+
+- **Section-opening 3-grams** (10,488 kinds) — for example, the highest-frequency opener in abstract sections is `here we` (appears in 279 papers).
+- **Within-section transition templates** (1,668 kinds) — for example, `Although X, Y.` appears in 15 out of 15 papers in introduction sections.
+- **Verb tiering by evidence strength** (124 kinds) — for example, causal (strong) -> `show` / `demonstrate` / `identify`; associative (medium) -> `suggest` / `indicate` / `support`; speculative (weak) -> `may` / `could` / `possibly`.
+- **Cross-section linking templates** (1,766 kinds) — for example, intro -> results uses `Having established X, we next asked whether Y` (50 papers).
+- **Results section opening sentences** (4,864 kinds) — for example, `To characterize X, we performed Y`.
+
+Total: 19,378 writing patterns.
+
+#### 2. Logic line extraction
+
+Writing logic (logic_line) mapped from the input's recognizable structure (method + finding + significance), and explicitly output to the summary.
+
+For example, with the input above: "We used CRISPRi to screen 287 transcription factors and identified ZNF219, a previously uncharacterized transcription factor that represses neural differentiation."
+
+The output text is: "Here we applied CRISPRi screening to a panel of 287 transcription factors (TFs) and identified ZNF219, a previously uncharacterized TF, as a repressor of neural differentiation."
+
+The corresponding logic_line output is: "screen -> single hit -> mechanism"
+
+#### 3. Modular writing + agent auto-identification
+
+The skill doesn't rewrite the entire text at once; instead it rewrites by paper module independently (auto-identification). It also provides a `multi_section` mode where the agent **automatically** identifies the content and rewrites a complete multi-section paper based on the input:
+
+| Module | Purpose | Input length suggestion |
 |---|---|---|
-| 5 Nature phrasing / transition TSVs | `knowledge/*.tsv` (see below) | Decide "which phrasing / transition to use" |
-| 3 hedge tiers (causal / associative / speculative) | `knowledge/hedge_verbs.tsv` | Decide "how strong a verb" |
-| 10 cross-section rules (X001–X010) | `knowledge/cross_section_rules.tsv` | Decide "how to stay consistent across sections" |
-| 4–12 SP formats (SP001–SP012) | `knowledge/paper_story_patterns.tsv` | Decide "section order in multi-section orchestration" |
-| 1 anti-AI-tell blacklist | `knowledge/anti_ai_patterns.tsv` | Decide "phrasing that must never appear" |
+| `abstract` | Abstract rewrite | 100-250 characters |
+| `introduction` | Introduction rewrite | 300-800 characters |
+| `methods` | Methods rewrite | 200-500 characters |
+| `results` | Results rewrite | 300-800 characters |
+| `discussion` | Discussion rewrite | 300-600 characters |
+| `figure_legend` | Figure legend rewrite | 50-150 characters |
+| `sentence` | Sentence-level polish (shortest input) | Any |
+| `multi_section` | Multi-paragraph content | Any |
 
-### 1. Five Nature phrasing / transition TSVs (18,910 3-grams / patterns total)
+In multi_section mode, inputting an 800-character Chinese draft, the agent automatically identifies it as "results + discussion" type, applies the SP005 pattern (results + discussion stitching), and won't force an abstract.
 
-**What it is**: Sentence-form and word-frequency statistics extracted directly from Nature full papers. The skill picks the best-matching phrasing by section position + context — no free-form LLM invention.
+#### 4. Anti-AI vocabulary via adversarial learning
 
-**Why five TSVs**: Each one answers one distinct "which phrasing" decision:
+When LLMs imitate Nature style, they always carry some "AI flavor" phrases. We based on 30 real articles' content logic, let LLM perform rewriting. Using the real articles' content as negative control, we extracted 136 AI-tells (commonly used AI words) from the LLM-written articles, **always forbidden** during rewriting. Three tiers:
 
-| TSV | Decision it answers | Rows |
+| Level | Count | Typical examples |
 |---|---|---|
-| `gap_transitions.tsv` | Which pivot for in-section contrast | 1668 |
-| `opener_distribution.tsv` | Which 3-gram at section opener (here we / by contrast / we show / ...) | 10488 |
-| `cross_section_linkers.tsv` | Cross-section linking templates ("Having established X, we next asked Y" etc.) | **1766** (v2.0.1=1670, v3 paragraph-level bridge +96) |
-| `hedge_verbs.tsv` | Verbs bucketed by evidence strength (causal → show / demonstrate; associative → suggest / indicate; speculative → may / could) | 124 |
-| `results_discussion_openers.tsv` | Results-section opener templates ("To characterize X, we performed Y" etc.) | 4864 |
+| **Severe AI-tells** (must replace) | 40 | `delve into` / `navigate the complexities of` / `shed light on` / `key role in` |
+| **Replacement AI-tells** (prefer swapping back to base words) | 127 | `leverage` / `utilize` / `robust` / `comprehensive` |
+| **Mild AI-tells** (just polish away) | 124 | `It's worth noting that` / `Importantly` / `It is important to note` |
 
-**Top samples**:
+The enforcement mechanism is in the [Verification Layer](#verification-layer) — not a soft rule.
 
-| Type | Top sample | Paper count |
+### How to invoke
+
+Two invocation modes, choose based on need or let the agent auto-detect:
+
+**Single-section rewrite (single_section)**: Pick one of the 7 `target`s, pass in the corresponding section's draft, get back the three deliverables.
+
+**Full-draft orchestration (multi_section)**: Pass in the entire draft, the agent automatically identifies the section structure, rewrites section by section, runs cross-section consistency audit (X001-X010), returns per-section JSON + `meta` object (`version_used` / `logic_line` / `entity_registry` / `cross_section`).
+
+The 7 single_section interfaces share the same prompt template `prompts/sections/<target>.txt`; multi_section uses a dedicated orchestrator `prompts/sections/multi_section.txt`.
+
+## Distillation output overview
+
+### Phrasing / linking category
+
+| TSV | One-line summary | Example |
 |---|---|---|
-| abstract opener | `here we` | 387 hits / 279 papers |
-| results opener | `We found that X` | 21 hits / 12 papers |
-| gap transition | `Although X, Y.` (introduction) | 15 hits / 15 papers |
-| hedge verb | `suggest` (associative) | 1645 hits / 409 papers |
-| cross-section linker | `Having established X, we next asked whether Y` (intro→results) | 50 papers |
+| `opener_distribution.tsv` (10,488 rows) | Section-opening 3-grams | abstract: `here we` (387 hits / 279 papers) |
+| `gap_transitions.tsv` (1,668 rows) | Within-section transition pivot words | introduction: `Although X, Y.` (15 hits / 15 papers) |
+| `cross_section_linkers.tsv` (1,766 rows) | Cross-section linking templates | intro -> results: `Having established X, we next asked whether Y` (50 papers) |
+| `hedge_verbs.tsv` (124 rows) | Verb tiering by evidence strength | associative tier: `suggest` (1,645 hits / 409 papers) |
+| `results_discussion_openers.tsv` (4,864 rows) | Results / discussion section opening templates | results: `To characterize X, we performed Y.` (21 hits / 12 papers) |
 
-### 2. Three hedge tiers (evidence strength bucketing)
+### Paper structure / rules category
 
-**What it is**: For "we found X", different evidence strengths demand different verbs. The skill buckets verbs into 3 tiers and picks by context.
-
-| Tier | Meaning | High-frequency verbs | Use where |
-|---|---|---|---|
-| **causal** | Direct cause / strong evidence | `show / demonstrate / establish / identify` | Only abstract + results core claims |
-| **associative** | Correlation / moderate evidence | `suggest / indicate / appear / consistent with / support / imply` | Discussion main claims |
-| **speculative** | Speculation / weak evidence | `may / could / might / possibly / probably / likely / hypothesize` | Outlook / future work |
-
-**Why 3 not 2**: Two tiers (causal / non-causal) collapses everything else into non-causal, losing the "moderate evidence" bucket which is the most common in Nature discussion. Three tiers matches Nature's actual rhythm.
-
-**Cross-section rule X001 hedge_ladder**: causal strongest in abstract + results, softens to associative in discussion, softens to speculative in outlook; **never escalates backwards** (discussion cannot be stronger than results). This rule is hard-coded as row 1 of `knowledge/cross_section_rules.tsv`.
-
-### 3. Ten cross-section rules (X001–X010)
-
-**What it is**: Consistency constraints the orchestrator must satisfy when stitching 5 sections into a full paper. Distilled from "cross-section fighting" issues Nature authors actually encounter.
-
-| ID | Rule | TSV row |
+| TSV | One-line summary | Example |
 |---|---|---|
-| X001 hedge_ladder | causal → associative → speculative decays across sections; never escalates backwards | row 1 |
-| X002 entity_continuity | Every number / abbreviation / gene / species / accession in `entity_registry` must be byte-identical across all sections that mention it | row 2 |
-| X003 citation_numbering | Citation superscripts assigned by first appearance order; never reused; continuous across sections | row 3 |
-| X004 abbreviation_expansion | First mention in full paper = full name + parenthetical abbreviation; afterwards abbreviation only; consistent across sections | row 4 |
-| X005 methods_last | SP001 / SP002 / SP005 formats: `methods` is always last | row 5 |
-| X006 transition_hooks | Section N's opener must echo Section N-1's closer in claim or entity | row 6 |
-| X007 hedge_consistency | Same underlying claim must keep the same hedge tier across abstract / intro / results / discussion | row 7 |
-| X008 logic_line_anchor | Each section's opener must trace to `logic_line` or `story_arc` | row 8 |
-| X009 numeric_format | 10 and above use Arabic numerals, 1–9 spelled out; consistent within and across sections | row 9 |
-| X010 reference_density_decay | Reference density: intro 5–10/section, results 0–2 (own data), discussion 1/paragraph | row 10 |
+| `paper_story_patterns.tsv` (12 rows) | Section patterns for the entire paper | SP001: abstract -> introduction -> results -> discussion -> methods (default) |
+| `cross_section_rules.tsv` (10 rows) | Cross-section consistency rules for multi-section orchestration | X001: hedge cannot strengthen backward; abstract uses causal, discussion cannot upgrade back to causal |
+| `inter_section_argue_chains.tsv` (21 rows, v3.1 proto) | 3-step argumentative chain (claim -> evidence -> hedge) | Experiment-style paragraph: claim_verb=`show` -> evidence_verb=`identify` -> hedge_verb=`suggest` |
 
-### 4. 4–12 SP formats (SP001–SP012)
+### Writing rules / phrases category
 
-**What it is**: The orchestrator picks a "section order template" by input length + section markers instead of mechanically abstract→intro→results→discussion→methods.
-
-| Input signature | SP picked | Section order |
+| TSV | One-line summary | Example |
 |---|---|---|
-| >= 800 words + contains abstract / intro / results / discussion / methods markers | **SP001** (default) | abstract → introduction → results → discussion → methods |
-| <= 600 words, no standalone abstract | SP002 | introduction → results → discussion → methods (inline abstract) |
-| 400–800 words, results + methods only | SP005 | abstract → introduction → results → methods |
+| `writing_rules.tsv` (85 rows) | Nature writing rule ID set | R001: active voice; R023: numerals >= 10 use Arabic, 1-9 spelled out |
+| `phrase_bank.tsv` (134 rows) | Reusable phrase templates | "Taken together, these findings..." |
+| `anti_ai_patterns.tsv` (136 rows) | AI-tell blacklist | See core design 2 above |
+| `domain_register.tsv` (46 rows) | Register for 22 biology sub-domains | genomics uses less passive, CRISPR class uses active |
+| `sentence_stats_by_domain.tsv` (24 rows) | Real sentence-length statistics per domain | genomics abstract averages 23 words / sentence |
 
-SP006–SP012 cover narrower scenarios (review / perspective / letter / corrigendum etc.) and are activated when the user explicitly passes `version=SP00X`.
+13 TSVs total 19,378 pattern rows. Each row has at least one Nature paper DOI as source anchor; rewrites select the best-matching sentence templates based on section-level context, not LLM improvisation.
 
-### 5. One anti-AI-tell blacklist (136 patterns)
+## Verification Layer
 
-**What it is**: Phrases extracted from LLM-generated articles pretending to be Nature style. The skill **never** uses them.
+After rewriting, before output, the skill passes through a verification layer where the agent quality-checks the content to avoid fabricated information. **5 rules in fixed order**:
 
-| Category | Count | Examples |
+| Rule | Function | Hit example |
 |---|---|---|
-| Severe AI-tell | 40 | `delve into` / `navigate the complexities of` / `shed light on` / `key role in` |
-| Substitute AI-tell | 127 | `leverage` / `utilize` / `robust` / `comprehensive` |
-| Minor AI-tell | 124 | `It's worth noting that` / `Importantly` / `It is important to note` |
+| **1a Traceability (HARD)** | Figure numbers, citation tokens, numerical values, organism / tissue / cell-type etc. biological entities in output must be traceable to same literal or synonym in input | Input doesn't mention "Fig. 3", output has "(Fig. 3)" -> delete |
+| **1b General knowledge whitelist** | General scientific knowledge allowed to not appear in input | `alternative splicing` / `transcriptome` / `eukaryotes` don't need traceability |
+| **2 em-dash zero tolerance** | Output must not contain U+2014 | "regulation—mediated by..." -> rewrite |
+| **2.5 em-dash deterministic scrub** | Run `strip_em_dash()` once on each of `text` / `text_compact`; hard post-process | Same as above, mandatory |
+| **4 Citation requirement** | Background claims in introduction must carry citations | "Several studies have shown..." without citations -> add [1] / [2] placeholders |
 
-Total **136 patterns** (some rows span multiple categories), recorded in `knowledge/anti_ai_patterns.tsv`.
+**Fix method**: First delete hallucinated tokens; if the sentence depends on the token, rewrite the sentence; other sections unchanged.
 
-**How it is enforced**: The Verification Layer's final step scans `text` + `text_compact`; any hit triggers a rewrite. This is hard enforcement, not a soft rule.
+**Whitelist** (in rewrite lexicon, no traceability needed):
+- **Connectives**: and / then / here / through / by / using / with / of / from / to / in / on / as / that
+- **Common verbs**: show / identify / report / use / perform / measure / observe / suggest / demonstrate / establish / find
+- **Common nouns**: sample / cell / data / figure / method / condition / group / replicate / trial / experiment / analysis
+- **Domain-common entities**: CRISPR / CRISPRi / TF / RNA / DNA / mRNA / PCR
 
-## Output contract
-
-- **Every target produces three artefacts**: `text` (Nature-style English) + `text_compact` (60–70% length compressed version) + `summary` (rules hit + phrasings + verification result)
-- **`multi_section` adds one more layer (meta)**: per-section JSON + `meta` (`version_used` / `logic_line` / `entity_registry` / cross-section audit / `degraded` flag)
-- **Em-dash zero tolerance**: Neither `text` nor `text_compact` may contain U+2014 (—). The `strip_em_dash()` post-processor runs once on each string after the Verification Layer (hard post-process, not a soft rule)
-- **Bold policy**: only used for headings, table headers, confidence rows, citation anchors; body body never is bold
-- **Not emitted**: "preamble and compliance",", "claim→evidence map",", "coverage statement",", "adversarial self-check" and other internal blocks — they run inside the skill only, never reach files
-
-### Verification Layer (acceptance check, final step)
-
-5 rules in fixed order (runs AFTER anti-AI self-check, BEFORE returning to user):
-
-1. **Rule 1a Traceability (HARD)**: Figure numbers, citation tokens, numerics (n / P / fold), and named biology entities (organism / tissue / cell-type / technique / time point) in output must trace to input's same literal / synonym; untraced = fabrication, delete
-2. **Rule 1b General-knowledge allowlist**: General scientific knowledge (Tier B, e.g. `alternative splicing` / `transcriptome` / `eukaryotes`) is allowed without appearing in input; treated as background knowledge, no tracing required
-3. **Rule 2 Em-dash zero tolerance**: Output must contain zero U+2014 (—); treated as fabrication-grade violation
-4. **Rule 2.5 Em-dash deterministic scrub**: `text` and `text_compact` must each be post-processed by `strip_em_dash()` once; this is a hard post-process, not a soft rule; after execution `assert "—" not in text`
-5. **Rule 4 Citation requirement**: Introduction's background claims must carry citations; missing citation = citation miss (NOT Tier B general knowledge), must be filled with `[1]` / `[2]` placeholders in `entity_registry`
-
-**Repair procedure**: First delete hallucination tokens; if the sentence becomes mutilated, rewrite that sentence; leave other sections untouched.
-
-**Traceability whitelist** (rewriter's dictionary, no tracing needed):
-- Connectives: and / then / here / through / by / using / with / of / from / to / in / on / as / that
-- Generic verbs: show / identify / report / use / perform / measure / observe / suggest / demonstrate / establish / find
-- Generic nouns: sample / cell / data / figure / method / condition / group / replicate / trial / experiment / analysis
-- Domain-generic entities: CRISPR / CRISPRi / TF / RNA / DNA / mRNA / PCR
-
-Any token outside the whitelist must trace; untraceable = fabrication.
-
-## Knowledge base scale
-
-- **Distillation source**: Nature main-journal articles (2025–2026)
-- **v3 paragraph-level bridge distillation** (2026-08-25): agent-extracted **96 new bridges** appended to `cross_section_linkers.tsv` (1670 → 1766); spot-check 18 random rows verified 16/18 = **89%** (LCS ≥ 0.5)
-- **TSV total**: 13 files, **19,378 data rows** (gap_transitions 1668 + opener_distribution 10488 + cross_section_linkers 1766 + hedge_verbs 124 + results_discussion_openers 4864 + anti_ai_patterns 136 + cross_section_rules 10 + domain_register 46 + inter_section_argue_chains 21 + paper_story_patterns 12 + phrase_bank 134 + sentence_stats_by_domain 24 + writing_rules 85)
-- **Prompt total**: 10 prompts (`style_guide.txt` + `system_writer.txt` + 8 sections/*.txt)
-- **Adversarial samples**: LLM-pretending-Nature articles, **311 differences extracted** (40 severe + 127 substitute + 124 minor)
+Tokens outside the whitelist must be traceable; untraceable = fabricated.
 
 ## 🤝 Contributions
 
-Issues, suggestions and Pull Requests welcome!
+Welcome to raise issues, suggestions, and submit Pull Requests!
 
-For AI applications or collaboration, reach out:
+For AI-related applications or collaborations, please reach out:
 - 307686155@qq.com
