@@ -170,5 +170,4 @@ Tokens outside the whitelist must be traceable; untraceable = fabricated.
 
 Welcome to raise issues, suggestions, and submit Pull Requests!
 
-For AI-related applications or collaborations, please reach out:
-- 307686155@qq.com
+
