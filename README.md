@@ -79,11 +79,11 @@ skill 具有四大核心设计，具体如下：
 
 基于 input 的可识别结构（方法 + 发现 + 意义）映射出来的写作逻辑（logic_line），并且显式输出到summary中。
 
-比如上面的输入例子：我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化。
+**比如上面的输入例子**：我们用 CRISPRi 筛选了 287 个转录因子，找到 ZNF219 这个之前没报道过的转录因子，它抑制神经分化。
 
-输出 text 是："Here we applied CRISPRi screening to a panel of 287 transcription factors (TFs) and identified ZNF219, a previously uncharacterized TF, as a repressor of neural differentiation."
+**输出 text 是**："Here we applied CRISPRi screening to a panel of 287 transcription factors (TFs) and identified ZNF219, a previously uncharacterized TF, as a repressor of neural differentiation."
 
-对应的 logic_line输出是："screen → single hit → mechanism"
+**对应的 logic_line 输出是**："screen → single hit → mechanism"
 
 
 ### ③ 分模块写作 + agent 自动识别
