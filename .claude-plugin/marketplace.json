@@ -1,0 +1,15 @@
+{
+  "name": "nature-writing-studio",
+  "owner": {
+    "name": "sunjiaqi-xal"
+  },
+  "plugins": [
+    {
+      "name": "nature-writing-studio",
+      "source": "./",
+      "skills": [
+        "./skill"
+      ]
+    }
+  ]
+}
